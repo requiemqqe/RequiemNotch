@@ -120,15 +120,17 @@ final class NotchWindowController {
 
         // Новый трек или старт воспроизведения — показать мини-уведомление
         nowPlaying.onTrackChanged = { [weak self] in
+            guard Self.setting("showMusicActivity", default: true) else { return }
             self?.showActivity(.nowPlaying)
         }
         nowPlaying.start()
 
         // Подключили зарядку — показать мини-уведомление
         battery.onPluggedIn = { [weak self] in
+            guard Self.setting("showChargingActivity", default: true) else { return }
             self?.showActivity(.charging)
         }
-        // Кнопка «Тест: зарядка» из меню
+        // Кнопка «Preview» из настроек
         NotificationCenter.default.addObserver(
             forName: .testChargingActivity, object: nil, queue: .main
         ) { [weak self] _ in
@@ -237,5 +239,15 @@ final class NotchWindowController {
             model.isExpanded = value
         }
         panel.ignoresMouseEvents = !value
+
+        // Лёгкий щелчок трекпада при раскрытии
+        if value && Self.setting("hapticFeedback", default: true) {
+            NSHapticFeedbackManager.defaultPerformer.perform(.alignment, performanceTime: .now)
+        }
+    }
+
+    /// Прочитать переключатель из настроек
+    private static func setting(_ key: String, default value: Bool) -> Bool {
+        UserDefaults.standard.object(forKey: key) as? Bool ?? value
     }
 }

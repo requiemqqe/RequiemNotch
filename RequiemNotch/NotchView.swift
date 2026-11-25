@@ -62,7 +62,8 @@ struct NotchView: View {
         .onDrop(of: [.fileURL], isTargeted: $model.isDropTargeted) { providers in
             shelf.add(providers: providers)
             return true
-        }        // Прижимаем к верху прозрачной панели
+        }
+        // Прижимаем к верху прозрачной панели
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 }
@@ -110,6 +111,7 @@ struct NotchShape: Shape {
         return p
     }
 }
+
 // MARK: - Мини-уведомление (слева иконка, справа значение — как на iPhone)
 
 struct CompactActivityView: View {
@@ -226,7 +228,6 @@ struct BatteryIcon: View {
     }
 }
 
-/// Сюда добавляешь свои модули: плеер, календарь, полку файлов и т.д.
 // MARK: - Верхняя строка раскрытого острова (по бокам выреза)
 
 struct ExpandedHeader: View {
@@ -254,7 +255,7 @@ struct ClockView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(context.date, format: .dateTime.hour().minute())
                     .font(.system(size: 40, weight: .semibold, design: .rounded))
-                Text("Ничего не играет")
+                Text("Nothing playing")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -265,7 +266,7 @@ struct ClockView: View {
 /// Сюда добавляешь свои модули: плеер, календарь, полку файлов и т.д.
 struct ExpandedContent: View {
     @EnvironmentObject var nowPlaying: NowPlayingMonitor
-    
+
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
             // Слева — плеер, если что-то играет, иначе часы

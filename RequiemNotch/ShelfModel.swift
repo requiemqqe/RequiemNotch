@@ -35,7 +35,7 @@ final class ShelfModel: ObservableObject {
             }
         }
     }
-    
+
     func remove(_ url: URL) {
         items.removeAll { $0 == url }
         save()
@@ -58,7 +58,7 @@ struct ShelfView: View {
     @EnvironmentObject var model: NotchModel
     /// Файл сейчас над островом (приём файлов — в NotchView)
     private var isTargeted: Bool { model.isDropTargeted }
-    
+
     var body: some View {
         ZStack {
             // Фон
@@ -68,12 +68,12 @@ struct ShelfView: View {
             RoundedRectangle(cornerRadius: 14)
                 .strokeBorder(style: StrokeStyle(lineWidth: 1.5, dash: [5, 4]))
                 .foregroundStyle(.white.opacity(isTargeted ? 0.6 : (shelf.items.isEmpty ? 0.25 : 0)))
-            
+
             if shelf.items.isEmpty {
                 VStack(spacing: 6) {
                     Image(systemName: "tray.and.arrow.down")
                         .font(.system(size: 20))
-                    Text("Перетащи файлы сюда")
+                    Text("Drop files here")
                         .font(.caption)
                 }
                 .foregroundStyle(.secondary)
@@ -100,52 +100,55 @@ struct ShelfView: View {
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(.secondary)
-                .help("Очистить полку")
+                .help("Clear shelf")
                 .padding(6)
             }
         }
+        .animation(.easeInOut(duration: 0.15), value: isTargeted)
+        // Плавный переход пустая полка ↔ файлы
+        .animation(NotchAnimation.content, value: shelf.items)
     }
-    
-    // MARK: - Один файл на полке
-    
-    struct ShelfItemView: View {
-        let url: URL
-        @EnvironmentObject var shelf: ShelfModel
-        @State private var hovering = false
-        
-        var body: some View {
-            VStack(spacing: 4) {
-                Image(nsImage: NSWorkspace.shared.icon(forFile: url.path))
-                    .resizable()
-                    .frame(width: 44, height: 44)
-                Text(url.lastPathComponent)
-                    .font(.system(size: 10))
-                    .lineLimit(1)
-                    .truncationMode(.middle)
-                    .frame(width: 60)
-            }
-            .padding(4)
-            .background(
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(.white.opacity(hovering ? 0.1 : 0))
-            )
-            .onHover { hovering = $0 }
-            // Утащить файл с полки в Finder или любое приложение
-            .onDrag { NSItemProvider(object: url as NSURL) }
-            // Двойной клик — открыть
-            .onTapGesture(count: 2) { NSWorkspace.shared.open(url) }
-            // Правый клик
-            .contextMenu {
-                Button("Открыть") { NSWorkspace.shared.open(url) }
-                Button("Показать в Finder") {
-                    NSWorkspace.shared.activateFileViewerSelecting([url])
-                }#imageLiteral(resourceName: "Screenshot 2026-11-24 at 16.36.16.png")
-                Divider()
-                Button("Убрать с полки") {
-                    withAnimation { shelf.remove(url) }
-                }
-            }
-            .help(url.path)
+}
+
+// MARK: - Один файл на полке
+
+struct ShelfItemView: View {
+    let url: URL
+    @EnvironmentObject var shelf: ShelfModel
+    @State private var hovering = false
+
+    var body: some View {
+        VStack(spacing: 4) {
+            Image(nsImage: NSWorkspace.shared.icon(forFile: url.path))
+                .resizable()
+                .frame(width: 44, height: 44)
+            Text(url.lastPathComponent)
+                .font(.system(size: 10))
+                .lineLimit(1)
+                .truncationMode(.middle)
+                .frame(width: 60)
         }
+        .padding(4)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(.white.opacity(hovering ? 0.1 : 0))
+        )
+        .onHover { hovering = $0 }
+        // Утащить файл с полки в Finder или любое приложение
+        .onDrag { NSItemProvider(object: url as NSURL) }
+        // Двойной клик — открыть
+        .onTapGesture(count: 2) { NSWorkspace.shared.open(url) }
+        // Правый клик
+        .contextMenu {
+            Button("Open") { NSWorkspace.shared.open(url) }
+            Button("Show in Finder") {
+                NSWorkspace.shared.activateFileViewerSelecting([url])
+            }
+            Divider()
+            Button("Remove from shelf") {
+                withAnimation { shelf.remove(url) }
+            }
+        }
+        .help(url.path)
     }
 }

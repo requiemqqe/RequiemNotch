@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 import ServiceManagement
 
 // MARK: - Меню в строке меню
@@ -7,79 +8,293 @@ struct MenuBarContent: View {
     @Environment(\.openSettings) private var openSettings
 
     var body: some View {
-        Button("Настройки…") {
+        Button("Settings…") {
             NSApp.activate()          // вывести окно настроек на передний план
             openSettings()
         }
         .keyboardShortcut(",")
 
-        Button("Тест: зарядка") {
-            NotificationCenter.default.post(name: .testChargingActivity, object: nil)
-        }
-
         Divider()
 
-        Button("Выйти из RequiemNotch") {
+        Button("Quit RequiemNotch") {
             NSApp.terminate(nil)
         }
         .keyboardShortcut("q")
     }
 }
 
-// MARK: - Окно настроек
+// MARK: - Окно настроек (вкладки)
 
 struct SettingsView: View {
-    @AppStorage("openDelay") private var openDelay = 0.12
-    @AppStorage("closeDelay") private var closeDelay = 0.30
-    @AppStorage("colorfulBattery") private var colorfulBattery = false
-    @AppStorage("activityHeightAdjust") private var heightAdjust: Double = 0
-    
+    var body: some View {
+        TabView {
+            GeneralSettings()
+                .tabItem { Label("General", systemImage: "gearshape") }
+            IslandSettings()
+                .tabItem { Label("Island", systemImage: "capsule") }
+            MediaSettings()
+                .tabItem { Label("Media", systemImage: "play.circle") }
+            BatterySettings()
+                .tabItem { Label("Battery", systemImage: "bolt.fill") }
+            AboutSettings()
+                .tabItem { Label("About", systemImage: "info.circle") }
+        }
+        .frame(width: 540, height: 460)
+    }
+}
+
+// MARK: - Вкладка «General»: язык, автозапуск
+
+struct GeneralSettings: View {
+    @AppStorage("appLanguage") private var language: AppLanguage = .system
+    @State private var needsRestart = false
+
     var body: some View {
         Form {
-            Section("Общие") {
+            Section("Language") {
+                Picker(selection: $language) {
+                    ForEach(AppLanguage.allCases) { lang in
+                        lang.label.tag(lang)
+                    }
+                } label: {
+                    Text("Language")
+                    Text("Choose the interface language. The app restarts to apply it.")
+                }
+                .onChange(of: language) { _, newValue in
+                    newValue.apply()
+                    needsRestart = true
+                }
+
+                if needsRestart {
+                    HStack {
+                        Label("Restart required to apply the language.", systemImage: "arrow.clockwise")
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        Button("Restart now") { AppLanguage.relaunch() }
+                            .buttonStyle(.borderedProminent)
+                    }
+                }
+            }
+
+            Section("Startup") {
                 LaunchAtLoginToggle()
             }
+        }
+        .formStyle(.grouped)
+    }
+}
 
-            Section("Поведение острова") {
-                LabeledContent("Задержка раскрытия") {
-                    Slider(value: $openDelay, in: 0...0.5, step: 0.02)
-                    Text("\(openDelay, specifier: "%.2f") с")
-                        .monospacedDigit()
-                        .frame(width: 50, alignment: .trailing)
+// MARK: - Вкладка «Island»: поведение и подгонка
+
+struct IslandSettings: View {
+    @AppStorage("openDelay") private var openDelay = 0.12
+    @AppStorage("closeDelay") private var closeDelay = 0.30
+    @AppStorage("hapticFeedback") private var haptics = true
+    @AppStorage("activityHeightAdjust") private var heightAdjust: Double = 0
+
+    var body: some View {
+        Form {
+            Section("Behavior") {
+                LabeledContent {
+                    SliderValue(value: $openDelay, range: 0...0.5, step: 0.02, unit: "s")
+                } label: {
+                    Text("Open delay")
+                    Text("How long to hold the cursor over the notch before the island opens.")
                 }
-                LabeledContent("Задержка сворачивания") {
-                    Slider(value: $closeDelay, in: 0...1, step: 0.05)
-                    Text("\(closeDelay, specifier: "%.2f") с")
-                        .monospacedDigit()
-                        .frame(width: 50, alignment: .trailing)
+
+                LabeledContent {
+                    SliderValue(value: $closeDelay, range: 0...1, step: 0.05, unit: "s")
+                } label: {
+                    Text("Close delay")
+                    Text("How long the island stays open after the cursor leaves it.")
+                }
+
+                Toggle(isOn: $haptics) {
+                    Text("Haptic feedback")
+                    Text("A light tap on the trackpad when the island opens.")
                 }
             }
-            
-            Section("Подгонка под вырез") {
-                LabeledContent("Высота уведомлений") {
-                    Slider(value: $heightAdjust, in: -6...6, step: 0.5)
-                    Text("\(heightAdjust, specifier: "%+.1f") pt")
-                        .monospacedDigit()
-                        .frame(width: 60, alignment: .trailing)
+
+            Section("Fit to notch") {
+                LabeledContent {
+                    SliderValue(value: $heightAdjust, range: -6...6, step: 0.5, unit: "pt", signed: true)
+                } label: {
+                    Text("Notification height")
+                    Text("Fine-tune live notifications so they match the height of your notch exactly.")
                 }
+
                 HStack {
-                    Button("Показать тест") {
+                    Spacer()
+                    Button("Reset") { heightAdjust = 0 }
+                    Button("Preview") {
                         NotificationCenter.default.post(name: .testChargingActivity, object: nil)
                     }
-                    Button("Сбросить") { heightAdjust = 0 }
+                }
+            }
+        }
+        .formStyle(.grouped)
+    }
+}
+
+// MARK: - Вкладка «Media»: плеер
+
+struct MediaSettings: View {
+    @AppStorage("showMusicActivity") private var showActivity = true
+    @AppStorage("showSkipButtons") private var showSkipButtons = false
+
+    var body: some View {
+        Form {
+            Section("Notifications") {
+                Toggle(isOn: $showActivity) {
+                    Text("Show track changes")
+                    Text("Briefly show the artwork when a new track starts or playback resumes.")
                 }
             }
 
-            Section("Батарея") {
-                Toggle("Цветная батарея", isOn: $colorfulBattery)
-                Text("Зелёная → жёлтая ≤50% → оранжевая ≤20% → красная ≤10%. Выключено — как на Mac: белая, красная при ≤10%.")
-                    .font(.caption)
+            Section("Player") {
+                Toggle(isOn: $showSkipButtons) {
+                    Text("Show 15-second skip buttons")
+                    Text("Useful for podcasts, audiobooks and videos.")
+                }
+            }
+
+            Section {
+                Label("Works with Music, Spotify, browsers (YouTube) and most players that appear in Control Center.",
+                      systemImage: "info.circle")
+                    .font(.callout)
                     .foregroundStyle(.secondary)
             }
         }
         .formStyle(.grouped)
-        .frame(width: 440)
-        .fixedSize()
+    }
+}
+
+// MARK: - Вкладка «Battery»
+
+struct BatterySettings: View {
+    @AppStorage("showChargingActivity") private var showCharging = true
+    @AppStorage("colorfulBattery") private var colorful = false
+
+    var body: some View {
+        Form {
+            Section("Notifications") {
+                Toggle(isOn: $showCharging) {
+                    Text("Show charging animation")
+                    Text("Show the battery level for a few seconds when you connect the charger.")
+                }
+                HStack {
+                    Spacer()
+                    Button("Preview") {
+                        NotificationCenter.default.post(name: .testChargingActivity, object: nil)
+                    }
+                }
+            }
+
+            Section("Appearance") {
+                Toggle(isOn: $colorful) {
+                    Text("Colorful battery")
+                    Text("Green when the charge is high, then yellow, orange and red as it drops. When off, the icon looks like the one in the macOS menu bar.")
+                }
+            }
+        }
+        .formStyle(.grouped)
+    }
+}
+
+// MARK: - Вкладка «About»
+
+struct AboutSettings: View {
+    private var version: String {
+        let short = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
+        return "\(short) (\(build))"
+    }
+
+    var body: some View {
+        VStack(spacing: 10) {
+            Image(nsImage: NSApp.applicationIconImage)
+                .resizable()
+                .frame(width: 96, height: 96)
+            Text(verbatim: "RequiemNotch")
+                .font(.title.bold())
+            Text("A Dynamic Island for your Mac.")
+                .foregroundStyle(.secondary)
+            HStack(spacing: 4) {
+                Text("Version")
+                Text(verbatim: version)
+            }
+            .font(.callout)
+            .foregroundStyle(.secondary)
+
+            Link(destination: URL(string: "https://github.com/requiemqqe/RequiemNotch")!) {
+                Label("View on GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
+            }
+            .padding(.top, 6)
+
+            Text("Made by requiem")
+                .font(.caption)
+                .foregroundStyle(.tertiary)
+                .padding(.top, 10)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding()
+    }
+}
+
+// MARK: - Ползунок со значением
+
+struct SliderValue: View {
+    @Binding var value: Double
+    let range: ClosedRange<Double>
+    let step: Double
+    let unit: String
+    var signed = false
+
+    var body: some View {
+        HStack {
+            Slider(value: $value, in: range, step: step)
+                .frame(width: 160)
+            Text(verbatim: String(format: signed ? "%+.1f %@" : "%.2f %@", value, unit))
+                .monospacedDigit()
+                .foregroundStyle(.secondary)
+                .frame(width: 60, alignment: .trailing)
+        }
+    }
+}
+
+// MARK: - Язык приложения
+
+enum AppLanguage: String, CaseIterable, Identifiable {
+    case system, en, ru, uk
+
+    var id: String { rawValue }
+
+    /// Названия языков пишем на самих языках — так их узнают в любом интерфейсе
+    @ViewBuilder var label: some View {
+        switch self {
+        case .system: Text("System default")
+        case .en: Text(verbatim: "English")
+        case .ru: Text(verbatim: "Русский")
+        case .uk: Text(verbatim: "Українська")
+        }
+    }
+
+    /// Сохранить выбор: macOS применит его при следующем запуске
+    func apply() {
+        if self == .system {
+            UserDefaults.standard.removeObject(forKey: "AppleLanguages")
+        } else {
+            UserDefaults.standard.set([rawValue], forKey: "AppleLanguages")
+        }
+    }
+
+    /// Перезапустить приложение
+    static func relaunch() {
+        let config = NSWorkspace.OpenConfiguration()
+        config.createsNewApplicationInstance = true
+        NSWorkspace.shared.openApplication(at: Bundle.main.bundleURL, configuration: config) { _, _ in
+            DispatchQueue.main.async { NSApp.terminate(nil) }
+        }
     }
 }
 
@@ -89,19 +304,22 @@ struct LaunchAtLoginToggle: View {
     @State private var enabled = SMAppService.mainApp.status == .enabled
 
     var body: some View {
-        Toggle("Запускать при входе в систему", isOn: $enabled)
-            .onChange(of: enabled) { _, newValue in
-                do {
-                    if newValue {
-                        try SMAppService.mainApp.register()
-                    } else {
-                        try SMAppService.mainApp.unregister()
-                    }
-                } catch {
-                    // Не получилось — вернуть переключатель в реальное состояние
-                    enabled = SMAppService.mainApp.status == .enabled
-                    print("Автозапуск: \(error)")
+        Toggle(isOn: $enabled) {
+            Text("Launch at login")
+            Text("Start RequiemNotch automatically when you log in to your Mac.")
+        }
+        .onChange(of: enabled) { _, newValue in
+            do {
+                if newValue {
+                    try SMAppService.mainApp.register()
+                } else {
+                    try SMAppService.mainApp.unregister()
                 }
+            } catch {
+                // Не получилось — вернуть переключатель в реальное состояние
+                enabled = SMAppService.mainApp.status == .enabled
+                print("Launch at login: \(error)")
             }
+        }
     }
 }
