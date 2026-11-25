@@ -22,10 +22,14 @@ struct NotchView: View {
                 .fill(.black)
 
             if model.isExpanded {
-                ExpandedContent()
-                    .padding(.top, model.notchSize.height + 4)
-                    .padding(.horizontal, 24 + top)
-                    .transition(.opacity.combined(with: .scale(scale: 0.9, anchor: .top)))
+                VStack(spacing: 4) {
+                    // Верхняя строка по бокам выреза: дата и батарея
+                    ExpandedHeader()
+                        .frame(height: model.notchSize.height)
+                    ExpandedContent()
+                }
+                .padding(.horizontal, 24 + top)
+                .transition(.opacity.combined(with: .scale(scale: 0.9, anchor: .top)))
             } else if let activity = model.activity {
                 CompactActivityView(activity: activity)
                     .padding(.horizontal, 12 + top)
@@ -40,6 +44,49 @@ struct NotchView: View {
     }
 }
 
+// MARK: - Форма как у Dynamic Island: вогнутые верхние углы, скруглённые нижние
+
+struct NotchShape: Shape {
+    var topRadius: CGFloat
+    var bottomRadius: CGFloat
+
+    // Чтобы радиусы плавно анимировались вместе с размером
+    var animatableData: AnimatablePair<CGFloat, CGFloat> {
+        get { AnimatablePair(topRadius, bottomRadius) }
+        set {
+            topRadius = newValue.first
+            bottomRadius = newValue.second
+        }
+    }
+
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        let t = topRadius
+        let b = bottomRadius
+
+        p.move(to: CGPoint(x: rect.minX, y: rect.minY))
+        // левое вогнутое ушко
+        p.addQuadCurve(to: CGPoint(x: rect.minX + t, y: rect.minY + t),
+                       control: CGPoint(x: rect.minX + t, y: rect.minY))
+        // левая сторона вниз
+        p.addLine(to: CGPoint(x: rect.minX + t, y: rect.maxY - b))
+        // левый нижний угол
+        p.addQuadCurve(to: CGPoint(x: rect.minX + t + b, y: rect.maxY),
+                       control: CGPoint(x: rect.minX + t, y: rect.maxY))
+        // низ
+        p.addLine(to: CGPoint(x: rect.maxX - t - b, y: rect.maxY))
+        // правый нижний угол
+        p.addQuadCurve(to: CGPoint(x: rect.maxX - t, y: rect.maxY - b),
+                       control: CGPoint(x: rect.maxX - t, y: rect.maxY))
+        // правая сторона вверх
+        p.addLine(to: CGPoint(x: rect.maxX - t, y: rect.minY + t))
+        // правое вогнутое ушко
+        p.addQuadCurve(to: CGPoint(x: rect.maxX, y: rect.minY),
+                       control: CGPoint(x: rect.maxX - t, y: rect.minY))
+        p.closeSubpath()
+        return p
+    }
+}
 // MARK: - Мини-уведомление (слева иконка, справа значение — как на iPhone)
 
 struct CompactActivityView: View {
@@ -48,6 +95,8 @@ struct CompactActivityView: View {
 
     var body: some View {
         switch activity {
+        case .nowPlaying:
+            MusicCompactView()
         case .charging:
             HStack {
                 Image(systemName: "bolt.fill")
@@ -155,64 +204,56 @@ struct BatteryIcon: View {
 }
 
 /// Сюда добавляешь свои модули: плеер, календарь, полку файлов и т.д.
-struct ExpandedContent: View {
+// MARK: - Верхняя строка раскрытого острова (по бокам выреза)
+
+struct ExpandedHeader: View {
     var body: some View {
-        HStack(alignment: .top, spacing: 20) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(Date(), style: .time)
-                    .font(.system(size: 34, weight: .semibold, design: .rounded))
-                Text(Date(), format: .dateTime.weekday(.wide).day().month())
-                    .font(.subheadline)
+        HStack {
+            // Дата слева (обновляется каждую минуту)
+            TimelineView(.everyMinute) { context in
+                Text(context.date, format: .dateTime.weekday(.abbreviated).day().month())
+                    .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(.secondary)
-                BatteryBadge()
-                    .padding(.top, 6)
             }
             Spacer()
-            ShelfView()
+            // Батарея справа
+            BatteryBadge()
         }
         .foregroundStyle(.white)
     }
 }
 
-// MARK: - Форма как у Dynamic Island: вогнутые верхние углы, скруглённые нижние
-struct NotchShape: Shape {
-    var topRadius: CGFloat
-    var bottomRadius: CGFloat
+// MARK: - Большие часы (когда ничего не играет)
 
-    // Чтобы радиусы плавно анимировались вместе с размером
-    var animatableData: AnimatablePair<CGFloat, CGFloat> {
-        get { AnimatablePair(topRadius, bottomRadius) }
-        set {
-            topRadius = newValue.first
-            bottomRadius = newValue.second
+struct ClockView: View {
+    var body: some View {
+        TimelineView(.everyMinute) { context in
+            VStack(alignment: .leading, spacing: 2) {
+                Text(context.date, format: .dateTime.hour().minute())
+                    .font(.system(size: 40, weight: .semibold, design: .rounded))
+                Text("Ничего не играет")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
         }
     }
+}
 
-    func path(in rect: CGRect) -> Path {
-        var p = Path()
-        let t = topRadius
-        let b = bottomRadius
+/// Сюда добавляешь свои модули: плеер, календарь, полку файлов и т.д.
+struct ExpandedContent: View {
+    @EnvironmentObject var nowPlaying: NowPlayingMonitor
 
-        p.move(to: CGPoint(x: rect.minX, y: rect.minY))
-        // левое вогнутое ушко
-        p.addQuadCurve(to: CGPoint(x: rect.minX + t, y: rect.minY + t),
-                       control: CGPoint(x: rect.minX + t, y: rect.minY))
-        // левая сторона вниз
-        p.addLine(to: CGPoint(x: rect.minX + t, y: rect.maxY - b))
-        // левый нижний угол
-        p.addQuadCurve(to: CGPoint(x: rect.minX + t + b, y: rect.maxY),
-                       control: CGPoint(x: rect.minX + t, y: rect.maxY))
-        // низ
-        p.addLine(to: CGPoint(x: rect.maxX - t - b, y: rect.maxY))
-        // правый нижний угол
-        p.addQuadCurve(to: CGPoint(x: rect.maxX - t, y: rect.maxY - b),
-                       control: CGPoint(x: rect.maxX - t, y: rect.maxY))
-        // правая сторона вверх
-        p.addLine(to: CGPoint(x: rect.maxX - t, y: rect.minY + t))
-        // правое вогнутое ушко
-        p.addQuadCurve(to: CGPoint(x: rect.maxX, y: rect.minY),
-                       control: CGPoint(x: rect.maxX - t, y: rect.minY))
-        p.closeSubpath()
-        return p
+    var body: some View {
+        HStack(alignment: .top, spacing: 16) {
+            // Слева — плеер, если что-то играет, иначе часы
+            if nowPlaying.hasMedia {
+                NowPlayingView()
+            } else {
+                ClockView()
+            }
+            Spacer(minLength: 0)
+            ShelfView()
+        }
+        .foregroundStyle(.white)
     }
 }

@@ -44,6 +44,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 /// Мини-уведомления, которые остров показывает сам (без наведения)
 enum NotchActivity: Equatable {
     case charging
+    case nowPlaying
 }
 
 final class NotchModel: ObservableObject {
@@ -53,7 +54,7 @@ final class NotchModel: ObservableObject {
     /// Реальный размер выреза (или запасной, если экран без выреза)
     @Published var notchSize = CGSize(width: 200, height: 32)
     /// Размер раскрытого острова
-    let expandedSize = CGSize(width: 520, height: 180)
+    let expandedSize = CGSize(width: 600, height: 180)
     /// Размер острова с мини-уведомлением: вырез + по 80pt с каждой стороны
     var activitySize: CGSize {
         CGSize(width: notchSize.width + 160, height: notchSize.height)
@@ -101,17 +102,25 @@ final class NotchWindowController {
     let model = NotchModel()
     let battery = BatteryMonitor()
     let shelf = ShelfModel()
+    let nowPlaying = NowPlayingMonitor()
     private let panel = NotchPanel()
     private var activityHideWork: DispatchWorkItem?
     private var monitors: [Any] = []
     /// Панель большая и прозрачная; видимая часть рисуется в SwiftUI
-    private let panelSize = CGSize(width: 640, height: 260)
+    private let panelSize = CGSize(width: 700, height: 260)
 
     func show() {
         panel.contentView = NSHostingView(rootView: NotchView()
             .environmentObject(model)
             .environmentObject(battery)
-            .environmentObject(shelf))
+            .environmentObject(shelf)
+            .environmentObject(nowPlaying))
+
+        // Новый трек или старт воспроизведения — показать мини-уведомление
+        nowPlaying.onTrackChanged = { [weak self] in
+            self?.showActivity(.nowPlaying)
+        }
+        nowPlaying.start()
 
         // Подключили зарядку — показать мини-уведомление
         battery.onPluggedIn = { [weak self] in
