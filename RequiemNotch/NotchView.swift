@@ -6,22 +6,23 @@ struct NotchView: View {
 
     var body: some View {
         let size = model.isExpanded ? model.expandedSize : model.notchSize
-        let radius: CGFloat = model.isExpanded ? 28 : 10
+        // Вогнутые «ушки» сверху и скругления снизу
+        let top: CGFloat = model.isExpanded ? 14 : 6
+        let bottom: CGFloat = model.isExpanded ? 28 : 10
 
         ZStack(alignment: .top) {
-            // Чёрная «капля», сливающаяся с вырезом
-            UnevenRoundedRectangle(bottomLeadingRadius: radius,
-                                   bottomTrailingRadius: radius)
+            NotchShape(topRadius: top, bottomRadius: bottom)
                 .fill(.black)
 
             if model.isExpanded {
                 ExpandedContent()
                     .padding(.top, model.notchSize.height + 4)
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal, 24 + top)
                     .transition(.opacity.combined(with: .scale(scale: 0.9, anchor: .top)))
             }
         }
-        .frame(width: size.width, height: size.height)
+        // Ушки выходят за пределы выреза, поэтому добавляем их ширину
+        .frame(width: size.width + top * 2, height: size.height)
         // Прижимаем к верху прозрачной панели
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
@@ -45,5 +46,48 @@ struct ExpandedContent: View {
                 .overlay(Text("Now Playing").foregroundStyle(.secondary))
         }
         .foregroundStyle(.white)
+    }
+}
+
+// MARK: - Форма как у Dynamic Island: вогнутые верхние углы, скруглённые нижние
+struct NotchShape: Shape {
+    var topRadius: CGFloat
+    var bottomRadius: CGFloat
+
+    // Чтобы радиусы плавно анимировались вместе с размером
+    var animatableData: AnimatablePair<CGFloat, CGFloat> {
+        get { AnimatablePair(topRadius, bottomRadius) }
+        set {
+            topRadius = newValue.first
+            bottomRadius = newValue.second
+        }
+    }
+
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        let t = topRadius
+        let b = bottomRadius
+
+        p.move(to: CGPoint(x: rect.minX, y: rect.minY))
+        // левое вогнутое ушко
+        p.addQuadCurve(to: CGPoint(x: rect.minX + t, y: rect.minY + t),
+                       control: CGPoint(x: rect.minX + t, y: rect.minY))
+        // левая сторона вниз
+        p.addLine(to: CGPoint(x: rect.minX + t, y: rect.maxY - b))
+        // левый нижний угол
+        p.addQuadCurve(to: CGPoint(x: rect.minX + t + b, y: rect.maxY),
+                       control: CGPoint(x: rect.minX + t, y: rect.maxY))
+        // низ
+        p.addLine(to: CGPoint(x: rect.maxX - t - b, y: rect.maxY))
+        // правый нижний угол
+        p.addQuadCurve(to: CGPoint(x: rect.maxX - t, y: rect.maxY - b),
+                       control: CGPoint(x: rect.maxX - t, y: rect.maxY))
+        // правая сторона вверх
+        p.addLine(to: CGPoint(x: rect.maxX - t, y: rect.minY + t))
+        // правое вогнутое ушко
+        p.addQuadCurve(to: CGPoint(x: rect.maxX, y: rect.minY),
+                       control: CGPoint(x: rect.maxX - t, y: rect.minY))
+        p.closeSubpath()
+        return p
     }
 }

@@ -7,8 +7,17 @@ import Combine
 @main
 struct NotchApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    // Окон у приложения нет — всё рисует наша панель
-    var body: some Scene { Settings { EmptyView() } }
+
+    var body: some Scene {
+        // Иконка в строке меню
+        MenuBarExtra("RequiemNotch", systemImage: "capsule.fill") {
+            MenuBarContent()
+        }
+        // Окно настроек
+        Settings {
+            SettingsView()
+        }
+    }
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -116,8 +125,12 @@ final class NotchWindowController {
     // Отложенное раскрытие/сворачивание (защита от дёрганья)
     private var hoverWork: DispatchWorkItem?
     private var pendingTarget: Bool?
-    private let openDelay = 0.05    // сек до раскрытия
-    private let closeDelay = 0.05   // сек до сворачивания
+    private var openDelay: Double {
+           UserDefaults.standard.object(forKey: "openDelay") as? Double ?? 0.12
+       }
+       private var closeDelay: Double {
+           UserDefaults.standard.object(forKey: "closeDelay") as? Double ?? 0.30
+       }  // сек до сворачивания
 
     private func updateHover() {
         let mouse = NSEvent.mouseLocation
