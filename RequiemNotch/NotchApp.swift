@@ -47,6 +47,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 enum NotchActivity: Equatable {
     case charging
     case nowPlaying
+    case bluetooth
 }
 
 final class NotchModel: ObservableObject {
@@ -107,6 +108,7 @@ final class NotchWindowController {
     let battery = BatteryMonitor()
     let shelf = ShelfModel()
     let nowPlaying = NowPlayingMonitor()
+    let bluetooth = BluetoothMonitor()
     private let panel = NotchPanel()
     private var activityHideWork: DispatchWorkItem?
     private var monitors: [Any] = []
@@ -118,7 +120,15 @@ final class NotchWindowController {
             .environmentObject(model)
             .environmentObject(battery)
             .environmentObject(shelf)
-            .environmentObject(nowPlaying))
+            .environmentObject(nowPlaying)
+            .environmentObject(bluetooth))
+
+        // Подключили наушники — показать мини-уведомление
+        bluetooth.onConnected = { [weak self] in
+            guard Self.setting("showBluetoothActivity", default: true) else { return }
+            self?.showActivity(.bluetooth, duration: 4)
+        }
+        bluetooth.start()
 
         // Новый трек или старт воспроизведения — показать мини-уведомление
         nowPlaying.onTrackChanged = { [weak self] in

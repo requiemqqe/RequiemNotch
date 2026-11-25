@@ -8,6 +8,10 @@ import MediaRemoteAdapter
 final class NowPlayingMonitor: ObservableObject {
     /// Информация о текущем треке (nil — ничего не играет)
     @Published private(set) var payload: TrackInfo.Payload?
+    /// Основной цвет обложки (nil — обложки нет)
+    @Published private(set) var artworkColor: Color?
+    /// Для какой обложки цвет уже посчитан
+    private var artworkColorKey: String?
 
     /// Вызывается при смене трека или старте воспроизведения
     var onTrackChanged: (() -> Void)?
@@ -71,6 +75,22 @@ final class NowPlayingMonitor: ObservableObject {
         let changed = key != nil && key != lastTrackKey
         lastTrackKey = key
 
+        // Цвет из обложки: считаем для каждой новой обложки
+        if payload == nil {
+            artworkColor = nil
+            artworkColorKey = nil
+        } else if let artwork = payload?.artwork {
+            let colorKey = "\(key ?? "")|\(Int(artwork.size.width))x\(Int(artwork.size.height))"
+            if colorKey != artworkColorKey {
+                artworkColorKey = colorKey
+                artworkColor = artwork.accentColor.map { Color(nsColor: $0) }
+            }
+        } else if changed {
+            // Новый трек без обложки — возвращаемся к белому
+            artworkColor = nil
+            artworkColorKey = nil
+        }
+
         if hasMedia && isPlaying && (changed || !wasPlaying) {
             onTrackChanged?()
         }
@@ -103,6 +123,11 @@ final class NowPlayingMonitor: ObservableObject {
     }
     func toggleShuffle() { controller.toggleShuffle() }
     func toggleRepeat() { controller.toggleRepeat() }
+
+    /// Цвет акцента: из обложки, либо белый (если выключено в настройках)
+    func tint(_ fromArtwork: Bool) -> Color {
+        fromArtwork ? (artworkColor ?? .white) : .white
+    }
 
     /// Открыть приложение, которое играет (Музыка, Spotify, браузер…)
     func openSourceApp() {
@@ -141,6 +166,7 @@ struct ArtworkView: View {
 
 struct EqualizerBars: View {
     let isPlaying: Bool
+    var color: Color = .white
 
     var body: some View {
         TimelineView(.animation(minimumInterval: 1 / 30, paused: !isPlaying)) { context in
@@ -149,7 +175,7 @@ struct EqualizerBars: View {
                 ForEach(0..<4, id: \.self) { i in
                     let phase = t * (3 + Double(i)) + Double(i)
                     Capsule()
-                        .fill(.white)
+                        .fill(color)
                         .frame(width: 3, height: isPlaying ? 4 + 10 * abs(sin(phase)) : 4)
                 }
             }
@@ -162,13 +188,15 @@ struct EqualizerBars: View {
 
 struct MusicCompactView: View {
     @EnvironmentObject var nowPlaying: NowPlayingMonitor
+    @AppStorage("artworkColors") private var artworkColors = true
 
     var body: some View {
         HStack {
             ArtworkView(image: nowPlaying.payload?.artwork, size: 20, corner: 5)
             Spacer()
-            EqualizerBars(isPlaying: nowPlaying.isPlaying)
+            EqualizerBars(isPlaying: nowPlaying.isPlaying, color: nowPlaying.tint(artworkColors))
         }
+        .animation(NotchAnimation.content, value: nowPlaying.tint(artworkColors))
     }
 }
 
@@ -176,6 +204,7 @@ struct MusicCompactView: View {
 
 struct NowPlayingView: View {
     @EnvironmentObject var nowPlaying: NowPlayingMonitor
+    @AppStorage("artworkColors") private var artworkColors = true
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -200,15 +229,24 @@ struct NowPlayingView: View {
                 .transition(.blurFade)
 
                 VStack(alignment: .leading, spacing: 1) {
-                    Text(nowPlaying.payload?.title ?? "")
-                        .font(.system(size: 13, weight: .semibold))
-                        .lineLimit(1)
-                        .contentTransition(.interpolate)
-                    Text(nowPlaying.payload?.artist ?? nowPlaying.payload?.applicationName ?? "")
-                        .font(.system(size: 12))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                        .contentTransition(.interpolate)
+                    HStack(alignment: .top, spacing: 6) {
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text(nowPlaying.payload?.title ?? "")
+                                .font(.system(size: 13, weight: .semibold))
+                                .lineLimit(1)
+                                .contentTransition(.interpolate)
+                            Text(nowPlaying.payload?.artist ?? nowPlaying.payload?.applicationName ?? "")
+                                .font(.system(size: 12))
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                                .contentTransition(.interpolate)
+                        }
+                        Spacer(minLength: 0)
+                        // Маленький эквалайзер в цвет обложки
+                        EqualizerBars(isPlaying: nowPlaying.isPlaying, color: nowPlaying.tint(artworkColors))
+                            .scaleEffect(0.8, anchor: .topTrailing)
+                            .padding(.top, 2)
+                    }
 
                     if nowPlaying.duration > 0 {
                         PlaybackProgress()
@@ -221,6 +259,7 @@ struct NowPlayingView: View {
         }
         .frame(width: 250, alignment: .leading)
         .animation(NotchAnimation.content, value: nowPlaying.payload?.title)
+        .animation(NotchAnimation.content, value: nowPlaying.tint(artworkColors))
     }
 }
 
@@ -231,14 +270,16 @@ struct PlayerControls: View {
     @AppStorage("showSkipButtons") private var showSkipButtons = false
     /// Длительность анимации ⏸ ↔ ▶︎ (настройки → Media), 0 — без анимации
     @AppStorage("playPauseAnimation") private var playPauseAnimation = 0.15
+    @AppStorage("artworkColors") private var artworkColors = true
 
     var body: some View {
+        let tint = nowPlaying.tint(artworkColors)
         HStack(spacing: 0) {
             // Перемешивание (если плеер поддерживает)
             if let shuffle = nowPlaying.shuffleMode {
                 Button { nowPlaying.toggleShuffle() } label: {
                     Image(systemName: "shuffle")
-                        .foregroundStyle(shuffle == .off ? Color.secondary : Color.white)
+                        .foregroundStyle(shuffle == .off ? Color.secondary : tint)
                 }
                 .help("Shuffle")
             } else {
@@ -296,7 +337,7 @@ struct PlayerControls: View {
             if let repeatMode = nowPlaying.repeatMode {
                 Button { nowPlaying.toggleRepeat() } label: {
                     Image(systemName: repeatMode == .one ? "repeat.1" : "repeat")
-                        .foregroundStyle(repeatMode == .off ? Color.secondary : Color.white)
+                        .foregroundStyle(repeatMode == .off ? Color.secondary : tint)
                         .contentTransition(.symbolEffect(.replace))
                 }
                 .help("Repeat")
@@ -308,6 +349,7 @@ struct PlayerControls: View {
         .font(.system(size: 14, weight: .medium))
         .frame(height: 24)
         .animation(NotchAnimation.content, value: showSkipButtons)
+        .animation(NotchAnimation.content, value: tint)
     }
 }
 
@@ -320,6 +362,7 @@ struct PlaybackProgress: View {
     @State private var hovering = false
     /// Длительность утолщения полосы при наведении (настройки → Media), 0 — без анимации
     @AppStorage("progressHoverAnimation") private var hoverAnimation = 0.12
+    @AppStorage("artworkColors") private var artworkColors = true
 
     var body: some View {
         // Обновляем раз в секунду
@@ -334,8 +377,8 @@ struct PlaybackProgress: View {
             VStack(spacing: 3) {
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {
-                        Capsule().fill(.white.opacity(0.2))
-                        Capsule().fill(.white)
+                        Capsule().fill(nowPlaying.tint(artworkColors).opacity(0.25))
+                        Capsule().fill(nowPlaying.tint(artworkColors))
                             .frame(width: geo.size.width * fraction)
                             // Пока тянем — без анимации, иначе едет непрерывно
                             .animation(scrubFraction == nil ? .linear(duration: 1) : nil, value: fraction)
@@ -376,5 +419,53 @@ struct PlaybackProgress: View {
     static func format(_ seconds: Double) -> String {
         let s = Int(max(0, seconds))
         return String(format: "%d:%02d", s / 60, s % 60)
+    }
+}
+
+// MARK: - Основной цвет картинки
+
+extension NSImage {
+    /// Самый «яркий» цвет обложки, осветлённый, чтобы хорошо читался на чёрном
+    var accentColor: NSColor? {
+        // Два способа достать пиксели: напрямую или через TIFF (если первый не сработал)
+        var rect = CGRect(origin: .zero, size: size)
+        guard let cg = cgImage(forProposedRect: &rect, context: nil, hints: nil)
+                ?? tiffRepresentation.flatMap({ NSBitmapImageRep(data: $0)?.cgImage })
+        else { return nil }
+        let side = 12
+        var pixels = [UInt8](repeating: 0, count: side * side * 4)
+
+        // Уменьшаем обложку до 12×12 — этого хватает, чтобы понять цвет
+        let drawn: Bool = pixels.withUnsafeMutableBytes { buffer in
+            guard let ctx = CGContext(data: buffer.baseAddress, width: side, height: side,
+                                      bitsPerComponent: 8, bytesPerRow: side * 4,
+                                      space: CGColorSpaceCreateDeviceRGB(),
+                                      bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
+            else { return false }
+            ctx.interpolationQuality = .medium
+            ctx.draw(cg, in: CGRect(x: 0, y: 0, width: side, height: side))
+            return true
+        }
+        guard drawn else { return nil }
+
+        // Насыщенные и яркие пиксели весят больше серых и тёмных
+        var r = 0.0, g = 0.0, b = 0.0, total = 0.0
+        for i in stride(from: 0, to: pixels.count, by: 4) {
+            let pr = Double(pixels[i]) / 255
+            let pg = Double(pixels[i + 1]) / 255
+            let pb = Double(pixels[i + 2]) / 255
+            let maxC = max(pr, pg, pb), minC = min(pr, pg, pb)
+            let saturation = maxC > 0 ? (maxC - minC) / maxC : 0
+            let weight = saturation * saturation * maxC + 0.01
+            r += pr * weight; g += pg * weight; b += pb * weight
+            total += weight
+        }
+        guard total > 0 else { return nil }
+
+        let average = NSColor(deviceRed: r / total, green: g / total, blue: b / total, alpha: 1)
+        var hue: CGFloat = 0, sat: CGFloat = 0, bright: CGFloat = 0, alpha: CGFloat = 0
+        average.getHue(&hue, saturation: &sat, brightness: &bright, alpha: &alpha)
+        return NSColor(deviceHue: hue, saturation: min(sat * 1.2, 0.85),
+                       brightness: max(bright, 0.85), alpha: 1)
     }
 }

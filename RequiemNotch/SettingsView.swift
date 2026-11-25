@@ -36,10 +36,12 @@ struct SettingsView: View {
                 .tabItem { Label("Media", systemImage: "play.circle") }
             BatterySettings()
                 .tabItem { Label("Battery", systemImage: "bolt.fill") }
+            DevicesSettings()
+                .tabItem { Label("Devices", systemImage: "headphones") }
             AboutSettings()
                 .tabItem { Label("About", systemImage: "info.circle") }
         }
-        .frame(width: 540, height: 460)
+        .frame(width: 560, height: 480)
     }
 }
 
@@ -144,6 +146,7 @@ struct MediaSettings: View {
     @AppStorage("showSkipButtons") private var showSkipButtons = false
     @AppStorage("playPauseAnimation") private var playPauseAnimation = 0.15
     @AppStorage("progressHoverAnimation") private var hoverAnimation = 0.12
+    @AppStorage("artworkColors") private var artworkColors = true
 
     var body: some View {
         Form {
@@ -158,6 +161,13 @@ struct MediaSettings: View {
                 Toggle(isOn: $showSkipButtons) {
                     Text("Show 15-second skip buttons")
                     Text("Useful for podcasts, audiobooks and videos.")
+                }
+            }
+
+            Section("Appearance") {
+                Toggle(isOn: $artworkColors) {
+                    Text("Colors from artwork")
+                    Text("Tint the equalizer, progress bar and buttons with the main color of the current artwork. When off, everything stays white.")
                 }
             }
 
@@ -213,6 +223,37 @@ struct BatterySettings: View {
                     Text("Colorful battery")
                     Text("Green when the charge is high, then yellow, orange and red as it drops. When off, the icon looks like the one in the macOS menu bar.")
                 }
+            }
+        }
+        .formStyle(.grouped)
+    }
+}
+
+// MARK: - Вкладка «Devices»: наушники и Bluetooth
+
+struct DevicesSettings: View {
+    @AppStorage("showBluetoothActivity") private var showBluetooth = true
+    @AppStorage("bluetoothHeadphonesOnly") private var headphonesOnly = true
+
+    var body: some View {
+        Form {
+            Section("Bluetooth") {
+                Toggle(isOn: $showBluetooth) {
+                    Text("Show connected devices")
+                    Text("Show the device icon and battery level when headphones connect.")
+                }
+                Toggle(isOn: $headphonesOnly) {
+                    Text("Headphones only")
+                    Text("When off, keyboards, mice and other Bluetooth devices are shown too.")
+                }
+                .disabled(!showBluetooth)
+            }
+
+            Section {
+                Label("Battery level is available for AirPods and Beats. Other headphones are shown without it.",
+                      systemImage: "info.circle")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
             }
         }
         .formStyle(.grouped)

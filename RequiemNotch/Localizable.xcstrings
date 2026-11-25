@@ -116,6 +116,9 @@
         }
       }
     },
+    "Battery level is available for AirPods and Beats. Other headphones are shown without it." : {
+
+    },
     "Behavior" : {
       "localizations" : {
         "ru" : {
@@ -131,6 +134,9 @@
           }
         }
       }
+    },
+    "Bluetooth" : {
+
     },
     "Briefly show the artwork when a new track starts or playback resumes." : {
       "localizations" : {
@@ -211,6 +217,12 @@
           }
         }
       }
+    },
+    "Colors from artwork" : {
+
+    },
+    "Devices" : {
+
     },
     "Drop files here" : {
       "localizations" : {
@@ -323,6 +335,9 @@
           }
         }
       }
+    },
+    "Headphones only" : {
+
     },
     "How long the island stays open after the cursor leaves it." : {
       "localizations" : {
@@ -823,6 +838,9 @@
         }
       }
     },
+    "Show connected devices" : {
+
+    },
     "Show in Finder" : {
       "localizations" : {
         "ru" : {
@@ -854,6 +872,9 @@
           }
         }
       }
+    },
+    "Show the device icon and battery level when headphones connect." : {
+
     },
     "Show track changes" : {
       "localizations" : {
@@ -935,6 +956,9 @@
         }
       }
     },
+    "Tint the equalizer, progress bar and buttons with the main color of the current artwork. When off, everything stays white." : {
+
+    },
     "Useful for podcasts, audiobooks and videos." : {
       "localizations" : {
         "ru" : {
@@ -982,6 +1006,9 @@
           }
         }
       }
+    },
+    "When off, keyboards, mice and other Bluetooth devices are shown too." : {
+
     },
     "Works with Music, Spotify, browsers (YouTube) and most players that appear in Control Center." : {
       "localizations" : {

@@ -122,6 +122,8 @@ struct CompactActivityView: View {
         switch activity {
         case .nowPlaying:
             MusicCompactView()
+        case .bluetooth:
+            BluetoothCompactView()
         case .charging:
             HStack {
                 Image(systemName: "bolt.fill")
@@ -231,6 +233,8 @@ struct BatteryIcon: View {
 // MARK: - Верхняя строка раскрытого острова (по бокам выреза)
 
 struct ExpandedHeader: View {
+    @EnvironmentObject var bluetooth: BluetoothMonitor
+
     var body: some View {
         HStack {
             // Дата слева (обновляется каждую минуту)
@@ -240,10 +244,14 @@ struct ExpandedHeader: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            // Батарея справа
-            BatteryBadge()
+            // Справа — подключённые наушники и батарея
+            HStack(spacing: 12) {
+                BluetoothBadge()
+                BatteryBadge()
+            }
         }
         .foregroundStyle(.white)
+        .animation(NotchAnimation.content, value: bluetooth.current)
     }
 }
 
