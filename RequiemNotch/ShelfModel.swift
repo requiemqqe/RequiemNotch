@@ -24,6 +24,18 @@ final class ShelfModel: ObservableObject {
         save()
     }
 
+    /// Добавить файлы, которые бросили на остров
+    func add(providers: [NSItemProvider]) {
+        for provider in providers {
+            _ = provider.loadObject(ofClass: URL.self) { [weak self] url, _ in
+                guard let url else { return }
+                DispatchQueue.main.async {
+                    withAnimation(.spring(response: 0.3)) { self?.add(url) }
+                }
+            }
+        }
+    }
+    
     func remove(_ url: URL) {
         items.removeAll { $0 == url }
         save()
@@ -43,8 +55,10 @@ final class ShelfModel: ObservableObject {
 
 struct ShelfView: View {
     @EnvironmentObject var shelf: ShelfModel
-    @State private var isTargeted = false   // файл сейчас над полкой
-
+    @EnvironmentObject var model: NotchModel
+    /// Файл сейчас над островом (приём файлов — в NotchView)
+    private var isTargeted: Bool { model.isDropTargeted }
+    
     var body: some View {
         ZStack {
             // Фон
@@ -54,7 +68,7 @@ struct ShelfView: View {
             RoundedRectangle(cornerRadius: 14)
                 .strokeBorder(style: StrokeStyle(lineWidth: 1.5, dash: [5, 4]))
                 .foregroundStyle(.white.opacity(isTargeted ? 0.6 : (shelf.items.isEmpty ? 0.25 : 0)))
-
+            
             if shelf.items.isEmpty {
                 VStack(spacing: 6) {
                     Image(systemName: "tray.and.arrow.down")
@@ -68,6 +82,7 @@ struct ShelfView: View {
                     HStack(spacing: 8) {
                         ForEach(shelf.items, id: \.self) { url in
                             ShelfItemView(url: url)
+                                .transition(.scale(scale: 0.6).combined(with: .opacity))
                         }
                     }
                     .padding(.horizontal, 10)
@@ -89,61 +104,48 @@ struct ShelfView: View {
                 .padding(6)
             }
         }
-        // Приём файлов
-        .onDrop(of: [.fileURL], isTargeted: $isTargeted) { providers in
-            for provider in providers {
-                _ = provider.loadObject(ofClass: URL.self) { url, _ in
-                    guard let url else { return }
-                    DispatchQueue.main.async {
-                        withAnimation(.spring(response: 0.3)) { shelf.add(url) }
-                    }
+    }
+    
+    // MARK: - Один файл на полке
+    
+    struct ShelfItemView: View {
+        let url: URL
+        @EnvironmentObject var shelf: ShelfModel
+        @State private var hovering = false
+        
+        var body: some View {
+            VStack(spacing: 4) {
+                Image(nsImage: NSWorkspace.shared.icon(forFile: url.path))
+                    .resizable()
+                    .frame(width: 44, height: 44)
+                Text(url.lastPathComponent)
+                    .font(.system(size: 10))
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+                    .frame(width: 60)
+            }
+            .padding(4)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(.white.opacity(hovering ? 0.1 : 0))
+            )
+            .onHover { hovering = $0 }
+            // Утащить файл с полки в Finder или любое приложение
+            .onDrag { NSItemProvider(object: url as NSURL) }
+            // Двойной клик — открыть
+            .onTapGesture(count: 2) { NSWorkspace.shared.open(url) }
+            // Правый клик
+            .contextMenu {
+                Button("Открыть") { NSWorkspace.shared.open(url) }
+                Button("Показать в Finder") {
+                    NSWorkspace.shared.activateFileViewerSelecting([url])
+                }#imageLiteral(resourceName: "Screenshot 2026-11-24 at 16.36.16.png")
+                Divider()
+                Button("Убрать с полки") {
+                    withAnimation { shelf.remove(url) }
                 }
             }
-            return true
+            .help(url.path)
         }
-        .animation(.easeInOut(duration: 0.15), value: isTargeted)
-    }
-}
-
-// MARK: - Один файл на полке
-
-struct ShelfItemView: View {
-    let url: URL
-    @EnvironmentObject var shelf: ShelfModel
-    @State private var hovering = false
-
-    var body: some View {
-        VStack(spacing: 4) {
-            Image(nsImage: NSWorkspace.shared.icon(forFile: url.path))
-                .resizable()
-                .frame(width: 44, height: 44)
-            Text(url.lastPathComponent)
-                .font(.system(size: 10))
-                .lineLimit(1)
-                .truncationMode(.middle)
-                .frame(width: 60)
-        }
-        .padding(4)
-        .background(
-            RoundedRectangle(cornerRadius: 8)
-                .fill(.white.opacity(hovering ? 0.1 : 0))
-        )
-        .onHover { hovering = $0 }
-        // Утащить файл с полки в Finder или любое приложение
-        .onDrag { NSItemProvider(object: url as NSURL) }
-        // Двойной клик — открыть
-        .onTapGesture(count: 2) { NSWorkspace.shared.open(url) }
-        // Правый клик
-        .contextMenu {
-            Button("Открыть") { NSWorkspace.shared.open(url) }
-            Button("Показать в Finder") {
-                NSWorkspace.shared.activateFileViewerSelecting([url])
-            }
-            Divider()
-            Button("Убрать с полки") {
-                withAnimation { shelf.remove(url) }
-            }
-        }
-        .help(url.path)
     }
 }

@@ -1,8 +1,10 @@
 import SwiftUI
 import Combine
+import UniformTypeIdentifiers
 
 struct NotchView: View {
     @EnvironmentObject var model: NotchModel
+    @EnvironmentObject var shelf: ShelfModel
     /// Подгонка высоты мини-уведомления под вырез (в настройках)
     @AppStorage("activityHeightAdjust") private var heightAdjust: Double = 0
 
@@ -28,18 +30,39 @@ struct NotchView: View {
                         .frame(height: model.notchSize.height)
                     ExpandedContent()
                 }
-                .padding(.horizontal, 24 + top)
-                .transition(.opacity.combined(with: .scale(scale: 0.9, anchor: .top)))
+                .padding(.horizontal, 38)
+                // Фиксированный размер: при сворачивании содержимое не перестраивается,
+                // а просто обрезается краями формы
+                .frame(width: model.expandedSize.width + 28,
+                       height: model.expandedSize.height,
+                       alignment: .top)
+                .transition(.asymmetric(
+                    // Появление из размытия — чуть позже, когда форма уже раскрылась
+                    insertion: .blurFade.animation(NotchAnimation.contentIn),
+                    // Исчезновение — быстро, раньше чем сожмётся форма
+                    removal: .blurFade.animation(NotchAnimation.contentOut)
+                ))
             } else if let activity = model.activity {
                 CompactActivityView(activity: activity)
                     .padding(.horizontal, 12 + top)
                     .frame(height: activityHeight)
-                    .transition(.opacity)
+                    .transition(.asymmetric(
+                        insertion: .blurFade.animation(NotchAnimation.contentIn),
+                        removal: .blurFade.animation(NotchAnimation.contentOut)
+                    ))
             }
         }
         // Ушки выходят за пределы выреза, поэтому добавляем их ширину
         .frame(width: size.width + top * 2, height: size.height)
-        // Прижимаем к верху прозрачной панели
+        // Всё, что выходит за чёрную форму, не видно
+        .clipShape(NotchShape(topRadius: top, bottomRadius: bottom))
+        // Мягкая тень у раскрытого острова
+        .shadow(color: .black.opacity(model.isExpanded ? 0.45 : 0), radius: 18, y: 8)
+        // Приём файлов на весь остров (не зависит от анимаций содержимого)
+        .onDrop(of: [.fileURL], isTargeted: $model.isDropTargeted) { providers in
+            shelf.add(providers: providers)
+            return true
+        }        // Прижимаем к верху прозрачной панели
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 }
@@ -242,18 +265,22 @@ struct ClockView: View {
 /// Сюда добавляешь свои модули: плеер, календарь, полку файлов и т.д.
 struct ExpandedContent: View {
     @EnvironmentObject var nowPlaying: NowPlayingMonitor
-
+    
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
             // Слева — плеер, если что-то играет, иначе часы
             if nowPlaying.hasMedia {
                 NowPlayingView()
+                    .transition(.blurFade)
             } else {
                 ClockView()
+                    .transition(.blurFade)
             }
             Spacer(minLength: 0)
             ShelfView()
         }
         .foregroundStyle(.white)
+        // Плавное переключение часы ↔ плеер
+        .animation(NotchAnimation.content, value: nowPlaying.hasMedia)
     }
 }

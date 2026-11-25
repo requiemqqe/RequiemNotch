@@ -49,6 +49,8 @@ enum NotchActivity: Equatable {
 
 final class NotchModel: ObservableObject {
     @Published var isExpanded = false
+    /// Над островом сейчас тащат файл
+    @Published var isDropTargeted = false
     /// Текущее мини-уведомление (nil — ничего не показываем)
     @Published var activity: NotchActivity? = nil
     /// Реальный размер выреза (или запасной, если экран без выреза)
@@ -132,6 +134,7 @@ final class NotchWindowController {
         ) { [weak self] _ in
             self?.showActivity(.charging)
         }
+
         reposition()
         panel.ignoresMouseEvents = true   // прозрачная часть не должна мешать кликам
         panel.orderFrontRegardless()
@@ -158,16 +161,16 @@ final class NotchWindowController {
                               height: panelSize.height),
                        display: true)
     }
-    
+
     /// Показать мини-уведомление на несколько секунд
     func showActivity(_ activity: NotchActivity, duration: Double = 3) {
         guard !model.isExpanded else { return }   // остров раскрыт — не мешаем
         activityHideWork?.cancel()
-        withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+        withAnimation(NotchAnimation.activityIn) {
             model.activity = activity
         }
         let work = DispatchWorkItem { [weak self] in
-            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+            withAnimation(NotchAnimation.activityOut) {
                 self?.model.activity = nil
             }
         }
@@ -175,15 +178,19 @@ final class NotchWindowController {
         DispatchQueue.main.asyncAfter(deadline: .now() + duration, execute: work)
     }
 
+    // MARK: Наведение мыши
+
     // Отложенное раскрытие/сворачивание (защита от дёрганья)
     private var hoverWork: DispatchWorkItem?
     private var pendingTarget: Bool?
+
+    // Задержки берутся из настроек (SettingsView), по умолчанию 0.12 и 0.3 сек
     private var openDelay: Double {
-           UserDefaults.standard.object(forKey: "openDelay") as? Double ?? 0.12
-       }
-       private var closeDelay: Double {
-           UserDefaults.standard.object(forKey: "closeDelay") as? Double ?? 0.30
-       }  // сек до сворачивания
+        UserDefaults.standard.object(forKey: "openDelay") as? Double ?? 0.12
+    }
+    private var closeDelay: Double {
+        UserDefaults.standard.object(forKey: "closeDelay") as? Double ?? 0.30
+    }
 
     private func updateHover() {
         let mouse = NSEvent.mouseLocation
@@ -226,7 +233,7 @@ final class NotchWindowController {
     }
 
     private func setExpanded(_ value: Bool) {
-        withAnimation(.spring(response: 0.35, dampingFraction: 0.75)) {
+        withAnimation(value ? NotchAnimation.open : NotchAnimation.close) {
             model.isExpanded = value
         }
         panel.ignoresMouseEvents = !value

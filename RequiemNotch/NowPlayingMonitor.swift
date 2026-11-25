@@ -128,15 +128,20 @@ struct NowPlayingView: View {
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             ArtworkView(image: nowPlaying.payload?.artwork, size: 64, corner: 12)
+                // Новый трек — обложка плавно сменяется
+                .id(nowPlaying.payload?.title)
+                .transition(.blurFade)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(nowPlaying.payload?.title ?? "")
                     .font(.system(size: 13, weight: .semibold))
                     .lineLimit(1)
+                    .contentTransition(.interpolate)
                 Text(nowPlaying.payload?.artist ?? nowPlaying.payload?.applicationName ?? "")
                     .font(.system(size: 12))
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
+                    .contentTransition(.interpolate)
 
                 if nowPlaying.duration > 0 {
                     PlaybackProgress()
@@ -152,17 +157,21 @@ struct NowPlayingView: View {
                         Image(systemName: nowPlaying.isPlaying ? "pause.fill" : "play.fill")
                             .font(.system(size: 18))
                             .frame(width: 20)
+                            // Плавная смена ⏸ ↔ ▶︎
+                            .contentTransition(.symbolEffect(.replace))
                     }
                     Button { nowPlaying.next() } label: {
                         Image(systemName: "forward.fill")
                     }
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.pressable)
                 .font(.system(size: 14))
                 .padding(.top, 6)
             }
         }
         .frame(width: 250, alignment: .leading)
+        .animation(NotchAnimation.content, value: nowPlaying.payload?.title)
+        .animation(NotchAnimation.content, value: nowPlaying.isPlaying)
     }
 }
 
@@ -184,6 +193,8 @@ struct PlaybackProgress: View {
                         Capsule().fill(.white.opacity(0.2))
                         Capsule().fill(.white)
                             .frame(width: geo.size.width * fraction)
+                            // Едет непрерывно, а не прыгает раз в секунду
+                            .animation(.linear(duration: 1), value: fraction)
                     }
                 }
                 .frame(height: 4)
