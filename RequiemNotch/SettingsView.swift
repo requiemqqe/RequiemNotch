@@ -31,6 +31,7 @@ struct MenuBarContent: View {
 struct SettingsView: View {
     @AppStorage("openDelay") private var openDelay = 0.12
     @AppStorage("closeDelay") private var closeDelay = 0.30
+    @AppStorage("colorfulBattery") private var colorfulBattery = false
 
     var body: some View {
         Form {
@@ -51,6 +52,13 @@ struct SettingsView: View {
                         .monospacedDigit()
                         .frame(width: 50, alignment: .trailing)
                 }
+            }
+
+            Section("Батарея") {
+                Toggle("Цветная батарея", isOn: $colorfulBattery)
+                Text("Зелёная → жёлтая ≤50% → оранжевая ≤20% → красная ≤10%. Выключено — как на Mac: белая, красная при ≤10%.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
         }
         .formStyle(.grouped)

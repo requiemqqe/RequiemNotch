@@ -62,31 +62,90 @@ struct CompactActivityView: View {
 
 struct BatteryBadge: View {
     @EnvironmentObject var battery: BatteryMonitor
-
-    private var symbol: String {
-        if battery.isCharging { return "battery.100.bolt" }
-        switch battery.level {
-        case 88...:   return "battery.100"
-        case 63..<88: return "battery.75"
-        case 38..<63: return "battery.50"
-        case 13..<38: return "battery.25"
-        default:      return "battery.0"
-        }
-    }
-
-    private var tint: Color {
-        if battery.isCharging { return .green }
-        return battery.level <= 20 ? .red : .white
-    }
+    @AppStorage("colorfulBattery") private var colorful = false
 
     var body: some View {
         HStack(spacing: 6) {
-            Image(systemName: symbol)
-                .foregroundStyle(tint)
+            BatteryIcon(
+                level: battery.level,
+                color: BatteryStyle.color(level: battery.level,
+                                          pluggedIn: battery.isPluggedIn,
+                                          lowPower: battery.isLowPower,
+                                          colorful: colorful),
+                charging: battery.isCharging,
+                pluggedIn: battery.isPluggedIn
+            )
             Text("\(battery.level)%")
                 .monospacedDigit()
         }
         .font(.system(size: 13, weight: .medium))
+    }
+}
+
+// MARK: - Цвет батареи в зависимости от заряда
+
+enum BatteryStyle {
+    static func color(level: Int, pluggedIn: Bool, lowPower: Bool, colorful: Bool) -> Color {
+        if pluggedIn { return .green }      // подключено питание
+        if lowPower { return .yellow }      // режим энергосбережения
+        if colorful {
+            switch level {
+            case ...10: return .red
+            case ...20: return .orange
+            case ...50: return .yellow
+            default:    return .green
+            }
+        }
+        // Как на Mac: белая, красная при 10% и ниже
+        return level <= 10 ? .red : .white
+    }
+}
+
+// MARK: - Сам значок батареи, нарисованный кодом
+
+struct BatteryIcon: View {
+    let level: Int
+    let color: Color
+    let charging: Bool
+    let pluggedIn: Bool
+
+    // Размеры корпуса
+    private let bodyWidth: CGFloat = 25
+    private let bodyHeight: CGFloat = 12
+    private let inset: CGFloat = 2
+
+    var body: some View {
+        HStack(spacing: 1) {
+            ZStack(alignment: .leading) {
+                // Корпус
+                RoundedRectangle(cornerRadius: 3.5)
+                    .stroke(.white.opacity(0.5), lineWidth: 1)
+                    .frame(width: bodyWidth, height: bodyHeight)
+
+                // Заливка — ширина зависит от процента
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(color)
+                    .frame(width: max(2, (bodyWidth - inset * 2) * CGFloat(level) / 100),
+                           height: bodyHeight - inset * 2)
+                    .padding(.leading, inset)
+                    .animation(.easeInOut(duration: 0.4), value: level)
+                    .animation(.easeInOut(duration: 0.4), value: color)
+
+                // Молния или вилка поверх заливки
+                if charging || pluggedIn {
+                    Image(systemName: charging ? "bolt.fill" : "powerplug.fill")
+                        .font(.system(size: 8, weight: .bold))
+                        .foregroundStyle(.white)
+                        .shadow(color: .black.opacity(0.7), radius: 1)
+                        .frame(width: bodyWidth, height: bodyHeight)
+                }
+            }
+
+            // «Пипка» батареи справа
+            RoundedRectangle(cornerRadius: 1)
+                .fill(.white.opacity(0.5))
+                .frame(width: 2, height: 4)
+        }
     }
 }
 

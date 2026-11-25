@@ -7,6 +7,8 @@ final class BatteryMonitor: ObservableObject {
     @Published private(set) var level: Int = 100
     @Published private(set) var isCharging = false
     @Published private(set) var isPluggedIn = false
+    /// Включён режим энергосбережения
+    @Published private(set) var isLowPower = ProcessInfo.processInfo.isLowPowerModeEnabled
 
     /// Вызывается, когда подключили зарядку
     var onPluggedIn: (() -> Void)?
@@ -26,8 +28,14 @@ final class BatteryMonitor: ObservableObject {
             CFRunLoopAddSource(CFRunLoopGetMain(), source, .defaultMode)
             runLoopSource = source
         }
-    }
 
+        // Включили/выключили режим энергосбережения
+        NotificationCenter.default.addObserver(
+            forName: .NSProcessInfoPowerStateDidChange, object: nil, queue: .main
+        ) { [weak self] _ in
+            self?.isLowPower = ProcessInfo.processInfo.isLowPowerModeEnabled
+        }
+    }
     deinit {
         if let source = runLoopSource {
             CFRunLoopRemoveSource(CFRunLoopGetMain(), source, .defaultMode)
