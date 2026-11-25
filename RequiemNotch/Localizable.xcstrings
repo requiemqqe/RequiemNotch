@@ -117,7 +117,20 @@
       }
     },
     "Battery level is available for AirPods and Beats. Other headphones are shown without it." : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Заряд доступен для AirPods и Beats. Другие наушники показываются без него."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Заряд доступний для AirPods і Beats. Інші навушники показуються без нього."
+          }
+        }
+      }
     },
     "Behavior" : {
       "localizations" : {
@@ -136,7 +149,20 @@
       }
     },
     "Bluetooth" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bluetooth"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bluetooth"
+          }
+        }
+      }
     },
     "Briefly show the artwork when a new track starts or playback resumes." : {
       "localizations" : {
@@ -150,6 +176,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ненадовго показувати обкладинку, коли починається новий трек або відновлюється відтворення."
+          }
+        }
+      }
+    },
+    "Charging and headphones" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Зарядка и наушники"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Заряджання й навушники"
           }
         }
       }
@@ -182,6 +224,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Очистити полицю"
+          }
+        }
+      }
+    },
+    "Click the capsule icon in the menu bar to open settings or quit." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нажмите на значок-капсулу в строке меню, чтобы открыть настройки или выйти."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Натисніть на значок-капсулу в рядку меню, щоб відкрити налаштування або вийти."
           }
         }
       }
@@ -219,10 +277,52 @@
       }
     },
     "Colors from artwork" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Цвета из обложки"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кольори з обкладинки"
+          }
+        }
+      }
+    },
+    "Control your music" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Управляйте музыкой"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Керуйте музикою"
+          }
+        }
+      }
     },
     "Devices" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Устройства"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пристрої"
+          }
+        }
+      }
     },
     "Drop files here" : {
       "localizations" : {
@@ -236,6 +336,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Перетягніть файли сюди"
+          }
+        }
+      }
+    },
+    "Drop files onto the island to carry them between desktops." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Бросьте файлы на остров, чтобы переносить их между рабочими столами."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Киньте файли на острів, щоб переносити їх між робочими столами."
           }
         }
       }
@@ -304,6 +420,22 @@
         }
       }
     },
+    "Get Started" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Начать"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Почати"
+          }
+        }
+      }
+    },
     "Green when the charge is high, then yellow, orange and red as it drops. When off, the icon looks like the one in the macOS menu bar." : {
       "localizations" : {
         "ru" : {
@@ -337,7 +469,36 @@
       }
     },
     "Headphones only" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Только наушники"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Лише навушники"
+          }
+        }
+      }
+    },
+    "Hover over the notch" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Наведите на вырез"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Наведіть на виріз"
+          }
+        }
+      }
     },
     "How long the island stays open after the cursor leaves it." : {
       "localizations" : {
@@ -419,6 +580,22 @@
         }
       }
     },
+    "Keep files at hand" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Файлы под рукой"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Файли під рукою"
+          }
+        }
+      }
+    },
     "Language" : {
       "localizations" : {
         "ru" : {
@@ -479,6 +656,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Медіа"
+          }
+        }
+      }
+    },
+    "Move the cursor to the notch to open the island." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подведите курсор к вырезу, чтобы раскрыть остров."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Підведіть курсор до вирізу, щоб розкрити острів."
           }
         }
       }
@@ -790,6 +983,70 @@
         }
       }
     },
+    "See what's playing in any app and control it right from the notch." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Смотрите, что играет в любом приложении, и управляйте прямо из выреза."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дивіться, що грає в будь-якому застосунку, і керуйте просто з вирізу."
+          }
+        }
+      }
+    },
+    "Send Feedback" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отправить отзыв"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Надіслати відгук"
+          }
+        }
+      }
+    },
+    "Send Feedback…" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отправить отзыв…"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Надіслати відгук…"
+          }
+        }
+      }
+    },
+    "Settings in the menu bar" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройки в строке меню"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Налаштування в рядку меню"
+          }
+        }
+      }
+    },
     "Settings…" : {
       "localizations" : {
         "ru" : {
@@ -839,7 +1096,20 @@
       }
     },
     "Show connected devices" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать подключённые устройства"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показувати підключені пристрої"
+          }
+        }
+      }
     },
     "Show in Finder" : {
       "localizations" : {
@@ -874,7 +1144,20 @@
       }
     },
     "Show the device icon and battery level when headphones connect." : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать иконку устройства и заряд при подключении наушников."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показувати іконку пристрою та заряд під час підключення навушників."
+          }
+        }
+      }
     },
     "Show track changes" : {
       "localizations" : {
@@ -956,8 +1239,37 @@
         }
       }
     },
+    "The island briefly shows when you plug in the charger or connect headphones." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Остров ненадолго показывает подключение зарядки или наушников."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Острів ненадовго показує підключення зарядки чи навушників."
+          }
+        }
+      }
+    },
     "Tint the equalizer, progress bar and buttons with the main color of the current artwork. When off, everything stays white." : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Окрашивать эквалайзер, полосу прогресса и кнопки в основной цвет обложки. Если выключено — всё белое."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фарбувати еквалайзер, смугу прогресу й кнопки в основний колір обкладинки. Якщо вимкнено — усе біле."
+          }
+        }
+      }
     },
     "Useful for podcasts, audiobooks and videos." : {
       "localizations" : {
@@ -1007,8 +1319,53 @@
         }
       }
     },
+    "Welcome Guide" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Приветствие"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Привітання"
+          }
+        }
+      }
+    },
+    "Welcome to RequiemNotch" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добро пожаловать в RequiemNotch"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ласкаво просимо до RequiemNotch"
+          }
+        }
+      }
+    },
     "When off, keyboards, mice and other Bluetooth devices are shown too." : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Если выключено, показываются и клавиатуры, мыши и другие Bluetooth-устройства."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Якщо вимкнено, показуються також клавіатури, миші та інші Bluetooth-пристрої."
+          }
+        }
+      }
     },
     "Works with Music, Spotify, browsers (YouTube) and most players that appear in Control Center." : {
       "localizations" : {
@@ -1022,6 +1379,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Працює з Музикою, Spotify, браузерами (YouTube) і більшістю плеєрів, які видно в Центрі керування."
+          }
+        }
+      }
+    },
+    "Your notch is now a Dynamic Island." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Теперь ваш вырез — это Dynamic Island."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тепер ваш виріз — це Dynamic Island."
           }
         }
       }

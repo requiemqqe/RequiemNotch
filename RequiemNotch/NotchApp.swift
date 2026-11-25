@@ -33,6 +33,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         controller.show()
         self.controller = controller
 
+        // Первый запуск — объяснить, как всё работает
+        WelcomeWindow.showIfNeeded()
+
         // Подключили/отключили монитор, сменили разрешение — пересчитать позицию
         NotificationCenter.default.addObserver(
             forName: NSApplication.didChangeScreenParametersNotification,
@@ -167,7 +170,9 @@ final class NotchWindowController {
     func reposition() {
         // Берём встроенный экран с вырезом, иначе основной
         guard let screen = NSScreen.screens.first(where: { $0.notchSize != nil }) ?? NSScreen.main else { return }
-        model.notchSize = screen.notchSize ?? CGSize(width: 200, height: 32)
+        // Mac без выреза: «псевдовырез» высотой со строку меню
+        let menuBarHeight = max(24, screen.frame.maxY - screen.visibleFrame.maxY)
+        model.notchSize = screen.notchSize ?? CGSize(width: 180, height: menuBarHeight)
         let f = screen.frame
         panel.setFrame(NSRect(x: f.midX - panelSize.width / 2,
                               y: f.maxY - panelSize.height,

@@ -4,6 +4,12 @@ import ServiceManagement
 
 // MARK: - Меню в строке меню
 
+/// Ссылки проекта (поменяй, если переименуешь репозиторий)
+enum AppLinks {
+    static let github = URL(string: "https://github.com/requiemqqe/RequiemNotch")!
+    static let feedback = URL(string: "https://github.com/requiemqqe/RequiemNotch/issues/new")!
+}
+
 struct MenuBarContent: View {
     @Environment(\.openSettings) private var openSettings
 
@@ -13,6 +19,14 @@ struct MenuBarContent: View {
             openSettings()
         }
         .keyboardShortcut(",")
+
+        Button("Welcome Guide") {
+            WelcomeWindow.show()
+        }
+
+        Button("Send Feedback…") {
+            NSWorkspace.shared.open(AppLinks.feedback)
+        }
 
         Divider()
 
@@ -285,8 +299,13 @@ struct AboutSettings: View {
             .font(.callout)
             .foregroundStyle(.secondary)
 
-            Link(destination: URL(string: "https://github.com/requiemqqe/RequiemNotch")!) {
-                Label("View on GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
+            HStack(spacing: 16) {
+                Link(destination: AppLinks.github) {
+                    Label("View on GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
+                }
+                Link(destination: AppLinks.feedback) {
+                    Label("Send Feedback", systemImage: "bubble.left.and.text.bubble.right")
+                }
             }
             .padding(.top, 6)
 
