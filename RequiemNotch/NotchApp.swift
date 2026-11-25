@@ -26,6 +26,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Без иконки в Dock и без пункта меню (как у NotchNook)
         NSApp.setActivationPolicy(.accessory)
+        // Запомнить язык запуска — по нему настройки решают, нужен ли перезапуск
+        _ = AppLanguage.atLaunch
 
         let controller = NotchWindowController()
         controller.show()

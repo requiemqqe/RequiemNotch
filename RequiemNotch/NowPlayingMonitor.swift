@@ -15,9 +15,14 @@ final class NowPlayingMonitor: ObservableObject {
     private let controller = MediaController()
     private var lastTrackKey: String?
     private var restartAttempts = 0
+    /// Состояние ⏯ сразу после нажатия — не ждём, пока плеер подтвердит
+    @Published private var optimisticPlaying: Bool?
+    private var optimisticResetWork: DispatchWorkItem?
 
     var hasMedia: Bool { !(payload?.title ?? "").isEmpty }
-    var isPlaying: Bool { payload?.isPlaying ?? ((payload?.playbackRate ?? 0) > 0) }
+    var isPlaying: Bool { optimisticPlaying ?? reportedPlaying }
+    /// Что сообщает сам плеер
+    private var reportedPlaying: Bool { payload?.isPlaying ?? ((payload?.playbackRate ?? 0) > 0) }
     /// Длительность в секундах (0 — неизвестна, например у стримов)
     var duration: Double { (payload?.durationMicros ?? 0) / 1_000_000 }
     /// nil — плеер не поддерживает перемешивание/повтор (например, YouTube)
@@ -57,6 +62,10 @@ final class NowPlayingMonitor: ObservableObject {
         let wasPlaying = isPlaying
         payload = info?.payload
         restartAttempts = 0
+        // Плеер подтвердил новое состояние — «опережающее» больше не нужно
+        if let optimistic = optimisticPlaying, reportedPlaying == optimistic {
+            optimisticPlaying = nil
+        }
 
         let key = payload.map { "\($0.title ?? "")|\($0.artist ?? "")" }
         let changed = key != nil && key != lastTrackKey
@@ -68,12 +77,30 @@ final class NowPlayingMonitor: ObservableObject {
     }
 
     // MARK: Управление
-    func togglePlayPause() { controller.togglePlayPause() }
+    func togglePlayPause() {
+        // Меняем иконку сразу, а плеер догонит
+        optimisticPlaying = !isPlaying
+        controller.togglePlayPause()
+        // Если плеер так и не ответил — через 2 с вернёмся к его реальному состоянию
+        optimisticResetWork?.cancel()
+        let work = DispatchWorkItem { [weak self] in self?.optimisticPlaying = nil }
+        optimisticResetWork = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: work)
+    }
     func next() { controller.nextTrack() }
     func previous() { controller.previousTrack() }
     func seek(to seconds: Double) { controller.setTime(seconds: seconds) }
-    func skipForward() { controller.skipFifteenSeconds() }
-    func skipBackward() { controller.goBackFifteenSeconds() }
+    func skipForward() { skip(by: 15) }
+    func skipBackward() { skip(by: -15) }
+
+    /// ±15 с через переход на позицию: Spotify и браузеры не понимают
+    /// системную команду «перемотать на 15 с», а переход на позицию — понимают
+    private func skip(by delta: Double) {
+        let current = payload?.currentElapsedTime ?? 0
+        var target = max(0, current + delta)
+        if duration > 0 { target = min(target, duration - 1) }
+        seek(to: target)
+    }
     func toggleShuffle() { controller.toggleShuffle() }
     func toggleRepeat() { controller.toggleRepeat() }
 
@@ -194,7 +221,6 @@ struct NowPlayingView: View {
         }
         .frame(width: 250, alignment: .leading)
         .animation(NotchAnimation.content, value: nowPlaying.payload?.title)
-        .animation(NotchAnimation.content, value: nowPlaying.isPlaying)
     }
 }
 
@@ -203,6 +229,8 @@ struct NowPlayingView: View {
 struct PlayerControls: View {
     @EnvironmentObject var nowPlaying: NowPlayingMonitor
     @AppStorage("showSkipButtons") private var showSkipButtons = false
+    /// Длительность анимации ⏸ ↔ ▶︎ (настройки → Media), 0 — без анимации
+    @AppStorage("playPauseAnimation") private var playPauseAnimation = 0.15
 
     var body: some View {
         HStack(spacing: 0) {
@@ -238,8 +266,12 @@ struct PlayerControls: View {
                 Image(systemName: nowPlaying.isPlaying ? "pause.fill" : "play.fill")
                     .font(.system(size: 20))
                     .frame(width: 22)
-                    // Плавная смена ⏸ ↔ ▶︎
-                    .contentTransition(.symbolEffect(.replace))
+                    // Смена ⏸ ↔ ▶︎ — скорость из настроек
+                    .contentTransition(playPauseAnimation > 0
+                        ? .symbolEffect(.replace, options: .speed(0.4 / playPauseAnimation))
+                        : .identity)
+                    .animation(playPauseAnimation > 0 ? .easeOut(duration: playPauseAnimation) : nil,
+                               value: nowPlaying.isPlaying)
             }
             .help("Play / Pause")
 
@@ -286,6 +318,8 @@ struct PlaybackProgress: View {
     /// Позиция, которую сейчас тянут мышью (0…1), nil — не тянут
     @State private var scrubFraction: Double? = nil
     @State private var hovering = false
+    /// Длительность утолщения полосы при наведении (настройки → Media), 0 — без анимации
+    @AppStorage("progressHoverAnimation") private var hoverAnimation = 0.12
 
     var body: some View {
         // Обновляем раз в секунду
@@ -326,7 +360,7 @@ struct PlaybackProgress: View {
                 }
                 .frame(height: 10)
                 .onHover { hovering = $0 }
-                .animation(.spring(response: 0.25, dampingFraction: 0.8), value: thick)
+                .animation(hoverAnimation > 0 ? .easeOut(duration: hoverAnimation) : nil, value: thick)
 
                 HStack {
                     Text(verbatim: Self.format(shown))

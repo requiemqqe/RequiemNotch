@@ -52,6 +52,22 @@
         }
       }
     },
+    "Animations" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Анимации"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Анімації"
+          }
+        }
+      }
+    },
     "Appearance" : {
       "localizations" : {
         "ru" : {
@@ -340,6 +356,38 @@
         }
       }
     },
+    "How quickly the play and pause icons switch. 0 turns the animation off." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Как быстро меняются иконки воспроизведения и паузы. 0 — без анимации."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Як швидко змінюються іконки відтворення й паузи. 0 — без анімації."
+          }
+        }
+      }
+    },
+    "How quickly the progress bar thickens when you hover over it. 0 turns the animation off." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Как быстро утолщается полоса прогресса при наведении. 0 — без анимации."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Як швидко потовщується смуга прогресу під час наведення. 0 — без анімації."
+          }
+        }
+      }
+    },
     "Island" : {
       "localizations" : {
         "ru" : {
@@ -548,6 +596,22 @@
         }
       }
     },
+    "Play/Pause icon" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Иконка паузы"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Іконка паузи"
+          }
+        }
+      }
+    },
     "Player" : {
       "localizations" : {
         "ru" : {
@@ -592,6 +656,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Попередній"
+          }
+        }
+      }
+    },
+    "Progress bar on hover" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Полоса прогресса при наведении"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Смуга прогресу під час наведення"
           }
         }
       }

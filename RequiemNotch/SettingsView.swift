@@ -47,7 +47,8 @@ struct SettingsView: View {
 
 struct GeneralSettings: View {
     @AppStorage("appLanguage") private var language: AppLanguage = .system
-    @State private var needsRestart = false
+    /// Перезапуск нужен, только если выбран не тот язык, с которым приложение запущено
+    private var needsRestart: Bool { language != AppLanguage.atLaunch }
 
     var body: some View {
         Form {
@@ -62,7 +63,6 @@ struct GeneralSettings: View {
                 }
                 .onChange(of: language) { _, newValue in
                     newValue.apply()
-                    needsRestart = true
                 }
 
                 if needsRestart {
@@ -81,6 +81,7 @@ struct GeneralSettings: View {
             }
         }
         .formStyle(.grouped)
+        .animation(.easeInOut(duration: 0.2), value: needsRestart)
     }
 }
 
@@ -141,6 +142,8 @@ struct IslandSettings: View {
 struct MediaSettings: View {
     @AppStorage("showMusicActivity") private var showActivity = true
     @AppStorage("showSkipButtons") private var showSkipButtons = false
+    @AppStorage("playPauseAnimation") private var playPauseAnimation = 0.15
+    @AppStorage("progressHoverAnimation") private var hoverAnimation = 0.12
 
     var body: some View {
         Form {
@@ -155,6 +158,21 @@ struct MediaSettings: View {
                 Toggle(isOn: $showSkipButtons) {
                     Text("Show 15-second skip buttons")
                     Text("Useful for podcasts, audiobooks and videos.")
+                }
+            }
+
+            Section("Animations") {
+                LabeledContent {
+                    SliderValue(value: $playPauseAnimation, range: 0...0.5, step: 0.05, unit: "s")
+                } label: {
+                    Text("Play/Pause icon")
+                    Text("How quickly the play and pause icons switch. 0 turns the animation off.")
+                }
+                LabeledContent {
+                    SliderValue(value: $hoverAnimation, range: 0...0.5, step: 0.02, unit: "s")
+                } label: {
+                    Text("Progress bar on hover")
+                    Text("How quickly the progress bar thickens when you hover over it. 0 turns the animation off.")
                 }
             }
 
@@ -268,6 +286,10 @@ enum AppLanguage: String, CaseIterable, Identifiable {
     case system, en, ru, uk
 
     var id: String { rawValue }
+
+    /// Язык, с которым приложение запущено (запоминается один раз при старте)
+    static let atLaunch: AppLanguage =
+        AppLanguage(rawValue: UserDefaults.standard.string(forKey: "appLanguage") ?? "") ?? .system
 
     /// Названия языков пишем на самих языках — так их узнают в любом интерфейсе
     @ViewBuilder var label: some View {
