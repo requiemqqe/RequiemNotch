@@ -32,7 +32,8 @@ struct SettingsView: View {
     @AppStorage("openDelay") private var openDelay = 0.12
     @AppStorage("closeDelay") private var closeDelay = 0.30
     @AppStorage("colorfulBattery") private var colorfulBattery = false
-
+    @AppStorage("activityHeightAdjust") private var heightAdjust: Double = 0
+    
     var body: some View {
         Form {
             Section("Общие") {
@@ -51,6 +52,21 @@ struct SettingsView: View {
                     Text("\(closeDelay, specifier: "%.2f") с")
                         .monospacedDigit()
                         .frame(width: 50, alignment: .trailing)
+                }
+            }
+            
+            Section("Подгонка под вырез") {
+                LabeledContent("Высота уведомлений") {
+                    Slider(value: $heightAdjust, in: -6...6, step: 0.5)
+                    Text("\(heightAdjust, specifier: "%+.1f") pt")
+                        .monospacedDigit()
+                        .frame(width: 60, alignment: .trailing)
+                }
+                HStack {
+                    Button("Показать тест") {
+                        NotificationCenter.default.post(name: .testChargingActivity, object: nil)
+                    }
+                    Button("Сбросить") { heightAdjust = 0 }
                 }
             }
 

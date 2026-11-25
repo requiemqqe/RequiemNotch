@@ -3,11 +3,16 @@ import Combine
 
 struct NotchView: View {
     @EnvironmentObject var model: NotchModel
+    /// Подгонка высоты мини-уведомления под вырез (в настройках)
+    @AppStorage("activityHeightAdjust") private var heightAdjust: Double = 0
 
     var body: some View {
+        let activityHeight = model.notchSize.height + heightAdjust
         let size: CGSize = model.isExpanded
             ? model.expandedSize
-            : (model.activity != nil ? model.activitySize : model.notchSize)
+            : (model.activity != nil
+               ? CGSize(width: model.activitySize.width, height: activityHeight)
+               : model.notchSize)
         // Вогнутые «ушки» сверху и скругления снизу
         let top: CGFloat = model.isExpanded ? 14 : 6
         let bottom: CGFloat = model.isExpanded ? 28 : 10
@@ -24,7 +29,7 @@ struct NotchView: View {
             } else if let activity = model.activity {
                 CompactActivityView(activity: activity)
                     .padding(.horizontal, 12 + top)
-                    .frame(height: model.notchSize.height)
+                    .frame(height: activityHeight)
                     .transition(.opacity)
             }
         }
