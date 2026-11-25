@@ -100,6 +100,7 @@ final class NotchPanel: NSPanel {
 final class NotchWindowController {
     let model = NotchModel()
     let battery = BatteryMonitor()
+    let shelf = ShelfModel()
     private let panel = NotchPanel()
     private var activityHideWork: DispatchWorkItem?
     private var monitors: [Any] = []
@@ -109,7 +110,8 @@ final class NotchWindowController {
     func show() {
         panel.contentView = NSHostingView(rootView: NotchView()
             .environmentObject(model)
-            .environmentObject(battery))
+            .environmentObject(battery)
+            .environmentObject(shelf))
 
         // Подключили зарядку — показать мини-уведомление
         battery.onPluggedIn = { [weak self] in
@@ -126,10 +128,10 @@ final class NotchWindowController {
         panel.orderFrontRegardless()
 
         let handler: (NSEvent) -> Void = { [weak self] _ in self?.updateHover() }
-        if let g = NSEvent.addGlobalMonitorForEvents(matching: [.mouseMoved, .leftMouseDragged], handler: handler) {
+        if let g = NSEvent.addGlobalMonitorForEvents(matching: [.mouseMoved, .leftMouseDragged, .leftMouseUp], handler: handler) {
             monitors.append(g)
         }
-        if let l = NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved, .leftMouseDragged], handler: { e in
+        if let l = NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved, .leftMouseDragged, .leftMouseUp], handler: { e in
             handler(e); return e
         }) {
             monitors.append(l)
@@ -199,6 +201,9 @@ final class NotchWindowController {
         pendingTarget = inside
         let work = DispatchWorkItem { [weak self] in
             self?.pendingTarget = nil
+            // Пока зажата кнопка мыши (тащим файл) — не сворачиваем,
+            // иначе перетаскивание с полки оборвётся. Свернёмся после отпускания.
+            if !inside && NSEvent.pressedMouseButtons & 1 != 0 { return }
             self?.setExpanded(inside)
         }
         hoverWork = work

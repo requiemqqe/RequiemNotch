@@ -163,10 +163,7 @@ struct ExpandedContent: View {
                     .padding(.top, 6)
             }
             Spacer()
-            RoundedRectangle(cornerRadius: 14)
-                .fill(.white.opacity(0.08))
-                .frame(width: 220, height: 100)
-                .overlay(Text("Now Playing").foregroundStyle(.secondary))
+            ShelfView()
         }
         .foregroundStyle(.white)
     }
