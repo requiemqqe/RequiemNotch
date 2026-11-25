@@ -13,6 +13,10 @@ struct MenuBarContent: View {
         }
         .keyboardShortcut(",")
 
+        Button("Тест: зарядка") {
+            NotificationCenter.default.post(name: .testChargingActivity, object: nil)
+        }
+
         Divider()
 
         Button("Выйти из RequiemNotch") {

@@ -5,7 +5,9 @@ struct NotchView: View {
     @EnvironmentObject var model: NotchModel
 
     var body: some View {
-        let size = model.isExpanded ? model.expandedSize : model.notchSize
+        let size: CGSize = model.isExpanded
+            ? model.expandedSize
+            : (model.activity != nil ? model.activitySize : model.notchSize)
         // Вогнутые «ушки» сверху и скругления снизу
         let top: CGFloat = model.isExpanded ? 14 : 6
         let bottom: CGFloat = model.isExpanded ? 28 : 10
@@ -19,12 +21,72 @@ struct NotchView: View {
                     .padding(.top, model.notchSize.height + 4)
                     .padding(.horizontal, 24 + top)
                     .transition(.opacity.combined(with: .scale(scale: 0.9, anchor: .top)))
+            } else if let activity = model.activity {
+                CompactActivityView(activity: activity)
+                    .padding(.horizontal, 12 + top)
+                    .frame(height: model.notchSize.height)
+                    .transition(.opacity)
             }
         }
         // Ушки выходят за пределы выреза, поэтому добавляем их ширину
         .frame(width: size.width + top * 2, height: size.height)
         // Прижимаем к верху прозрачной панели
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+    }
+}
+
+// MARK: - Мини-уведомление (слева иконка, справа значение — как на iPhone)
+
+struct CompactActivityView: View {
+    let activity: NotchActivity
+    @EnvironmentObject var battery: BatteryMonitor
+
+    var body: some View {
+        switch activity {
+        case .charging:
+            HStack {
+                Image(systemName: "bolt.fill")
+                    .foregroundStyle(.green)
+                    .symbolEffect(.pulse)
+                Spacer()
+                Text("\(battery.level)%")
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .monospacedDigit()
+                    .foregroundStyle(.white)
+            }
+        }
+    }
+}
+
+// MARK: - Значок батареи для раскрытого острова
+
+struct BatteryBadge: View {
+    @EnvironmentObject var battery: BatteryMonitor
+
+    private var symbol: String {
+        if battery.isCharging { return "battery.100.bolt" }
+        switch battery.level {
+        case 88...:   return "battery.100"
+        case 63..<88: return "battery.75"
+        case 38..<63: return "battery.50"
+        case 13..<38: return "battery.25"
+        default:      return "battery.0"
+        }
+    }
+
+    private var tint: Color {
+        if battery.isCharging { return .green }
+        return battery.level <= 20 ? .red : .white
+    }
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Image(systemName: symbol)
+                .foregroundStyle(tint)
+            Text("\(battery.level)%")
+                .monospacedDigit()
+        }
+        .font(.system(size: 13, weight: .medium))
     }
 }
 
@@ -38,6 +100,8 @@ struct ExpandedContent: View {
                 Text(Date(), format: .dateTime.weekday(.wide).day().month())
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+                BatteryBadge()
+                    .padding(.top, 6)
             }
             Spacer()
             RoundedRectangle(cornerRadius: 14)

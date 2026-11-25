@@ -41,12 +41,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 // MARK: - Модель состояния
 
+/// Мини-уведомления, которые остров показывает сам (без наведения)
+enum NotchActivity: Equatable {
+    case charging
+}
+
 final class NotchModel: ObservableObject {
     @Published var isExpanded = false
+    /// Текущее мини-уведомление (nil — ничего не показываем)
+    @Published var activity: NotchActivity? = nil
     /// Реальный размер выреза (или запасной, если экран без выреза)
     @Published var notchSize = CGSize(width: 200, height: 32)
     /// Размер раскрытого острова
     let expandedSize = CGSize(width: 520, height: 180)
+    /// Размер острова с мини-уведомлением: вырез + по 80pt с каждой стороны
+    var activitySize: CGSize {
+        CGSize(width: notchSize.width + 160, height: notchSize.height)
+    }
 }
 
 // MARK: - Размер выреза
@@ -88,13 +99,28 @@ final class NotchPanel: NSPanel {
 
 final class NotchWindowController {
     let model = NotchModel()
+    let battery = BatteryMonitor()
     private let panel = NotchPanel()
+    private var activityHideWork: DispatchWorkItem?
     private var monitors: [Any] = []
     /// Панель большая и прозрачная; видимая часть рисуется в SwiftUI
     private let panelSize = CGSize(width: 640, height: 260)
 
     func show() {
-        panel.contentView = NSHostingView(rootView: NotchView().environmentObject(model))
+        panel.contentView = NSHostingView(rootView: NotchView()
+            .environmentObject(model)
+            .environmentObject(battery))
+
+        // Подключили зарядку — показать мини-уведомление
+        battery.onPluggedIn = { [weak self] in
+            self?.showActivity(.charging)
+        }
+        // Кнопка «Тест: зарядка» из меню
+        NotificationCenter.default.addObserver(
+            forName: .testChargingActivity, object: nil, queue: .main
+        ) { [weak self] _ in
+            self?.showActivity(.charging)
+        }
         reposition()
         panel.ignoresMouseEvents = true   // прозрачная часть не должна мешать кликам
         panel.orderFrontRegardless()
@@ -120,6 +146,22 @@ final class NotchWindowController {
                               width: panelSize.width,
                               height: panelSize.height),
                        display: true)
+    }
+    
+    /// Показать мини-уведомление на несколько секунд
+    func showActivity(_ activity: NotchActivity, duration: Double = 3) {
+        guard !model.isExpanded else { return }   // остров раскрыт — не мешаем
+        activityHideWork?.cancel()
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+            model.activity = activity
+        }
+        let work = DispatchWorkItem { [weak self] in
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                self?.model.activity = nil
+            }
+        }
+        activityHideWork = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + duration, execute: work)
     }
 
     // Отложенное раскрытие/сворачивание (защита от дёрганья)
