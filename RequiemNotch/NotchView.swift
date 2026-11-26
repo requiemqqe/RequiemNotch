@@ -7,6 +7,17 @@ struct NotchView: View {
     @EnvironmentObject var shelf: ShelfModel
     /// Подгонка высоты мини-уведомления под вырез (в настройках)
     @AppStorage("activityHeightAdjust") private var heightAdjust: Double = 0
+    @AppStorage("nonNotchMode") private var nonNotchMode: NonNotchMode = .hover
+
+    /// На Mac без выреза остров может прятаться в покое или совсем
+    private var isInvisible: Bool {
+        guard !model.hasNotch else { return false }
+        switch nonNotchMode {
+        case .always: return false
+        case .hover: return !model.isExpanded && model.activity == nil
+        case .hidden: return true
+        }
+    }
 
     var body: some View {
         let activityHeight = model.notchSize.height + heightAdjust
@@ -58,6 +69,7 @@ struct NotchView: View {
         .clipShape(NotchShape(topRadius: top, bottomRadius: bottom))
         // Мягкая тень у раскрытого острова
         .shadow(color: .black.opacity(model.isExpanded ? 0.45 : 0), radius: 18, y: 8)
+        .opacity(isInvisible ? 0 : 1)
         // Приём файлов на весь остров (не зависит от анимаций содержимого)
         .onDrop(of: [.fileURL], isTargeted: $model.isDropTargeted) { providers in
             shelf.add(providers: providers)
@@ -244,6 +256,7 @@ struct ExpandedHeader: View {
             Spacer()
             // Справа — подключённые наушники и батарея
             HStack(spacing: 12) {
+                MirrorButton()
                 BluetoothBadge()
                 BatteryBadge()
             }
@@ -272,6 +285,7 @@ struct ClockView: View {
 /// Сюда добавляешь свои модули: плеер, календарь, полку файлов и т.д.
 struct ExpandedContent: View {
     @EnvironmentObject var nowPlaying: NowPlayingMonitor
+    @EnvironmentObject var model: NotchModel
 
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
@@ -284,10 +298,22 @@ struct ExpandedContent: View {
                     .transition(.blurFade)
             }
             Spacer(minLength: 0)
-            ShelfView()
+            // Справа — зеркало или полка
+            if model.showMirror {
+                MirrorView()
+                    .transition(.blurFade)
+            } else {
+                ShelfView()
+                    .transition(.blurFade)
+            }
         }
         .foregroundStyle(.white)
-        // Плавное переключение часы ↔ плеер
+        // Плавное переключение часы ↔ плеер и зеркало ↔ полка
         .animation(NotchAnimation.content, value: nowPlaying.hasMedia)
+        .animation(NotchAnimation.content, value: model.showMirror)
+        // Тащат файл на остров — вернуть полку
+        .onChange(of: model.isDropTargeted) { _, targeted in
+            if targeted { model.showMirror = false }
+        }
     }
 }

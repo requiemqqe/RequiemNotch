@@ -111,6 +111,8 @@ struct IslandSettings: View {
     @AppStorage("openDelay") private var openDelay = 0.12
     @AppStorage("closeDelay") private var closeDelay = 0.30
     @AppStorage("hapticFeedback") private var haptics = true
+    @AppStorage("showMirrorButton") private var showMirrorButton = true
+    @AppStorage("nonNotchMode") private var nonNotchMode: NonNotchMode = .hover
     @AppStorage("activityHeightAdjust") private var heightAdjust: Double = 0
 
     var body: some View {
@@ -133,6 +135,24 @@ struct IslandSettings: View {
                 Toggle(isOn: $haptics) {
                     Text("Haptic feedback")
                     Text("A light tap on the trackpad when the island opens.")
+                }
+            }
+
+            Section("Camera") {
+                Toggle(isOn: $showMirrorButton) {
+                    Text("Mirror button")
+                    Text("Show a camera button in the island to quickly check how you look before a call.")
+                }
+            }
+
+            Section("Macs without a notch") {
+                Picker(selection: $nonNotchMode) {
+                    Text("Always show").tag(NonNotchMode.always)
+                    Text("Show on hover").tag(NonNotchMode.hover)
+                    Text("Hide").tag(NonNotchMode.hidden)
+                } label: {
+                    Text("Island")
+                    Text("On a MacBook Air, iMac or external display the island can stay out of the way of the menu bar.")
                 }
             }
 

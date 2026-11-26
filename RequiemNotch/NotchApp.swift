@@ -10,8 +10,10 @@ struct NotchApp: App {
 
     var body: some Scene {
         // Иконка в строке меню
-        MenuBarExtra("RequiemNotch", systemImage: "capsule.fill") {
+        MenuBarExtra {
             MenuBarContent()
+        } label: {
+            Image(nsImage: MenuBarIcon.image)
         }
         // Окно настроек
         Settings {
@@ -46,6 +48,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 // MARK: - Модель состояния
 
+/// Поведение острова на Mac без выреза
+enum NonNotchMode: String, CaseIterable, Identifiable {
+    case always, hover, hidden
+    var id: String { rawValue }
+
+    static var current: NonNotchMode {
+        NonNotchMode(rawValue: UserDefaults.standard.string(forKey: "nonNotchMode") ?? "") ?? .hover
+    }
+}
+
 /// Мини-уведомления, которые остров показывает сам (без наведения)
 enum NotchActivity: Equatable {
     case charging
@@ -58,6 +70,13 @@ final class NotchModel: ObservableObject {
     @Published var isExpanded = false
     /// Над островом сейчас тащат файл
     @Published var isDropTargeted = false
+    /// В острове вместо полки показано зеркало с камеры
+    @Published var showMirror = false
+    /// У текущего экрана есть вырез
+    @Published var hasNotch = true
+
+    /// На Mac без выреза остров выключен совсем
+    var isHiddenHere: Bool { !hasNotch && NonNotchMode.current == .hidden }
     /// Текущее мини-уведомление (nil — ничего не показываем)
     @Published var activity: NotchActivity? = nil
     /// Реальный размер выреза (или запасной, если экран без выреза)
@@ -184,6 +203,7 @@ final class NotchWindowController {
         // Mac без выреза: «псевдовырез» высотой со строку меню
         let menuBarHeight = max(24, screen.frame.maxY - screen.visibleFrame.maxY)
         model.notchSize = screen.notchSize ?? CGSize(width: 180, height: menuBarHeight)
+        model.hasNotch = screen.notchSize != nil
         let f = screen.frame
         panel.setFrame(NSRect(x: f.midX - panelSize.width / 2,
                               y: f.maxY - panelSize.height,
@@ -195,6 +215,7 @@ final class NotchWindowController {
     /// Показать мини-уведомление на несколько секунд
     func showActivity(_ activity: NotchActivity, duration: Double = 3) {
         guard !model.isExpanded else { return }   // остров раскрыт — не мешаем
+        guard !model.isHiddenHere else { return } // на Mac без выреза остров выключен
         activityHideWork?.cancel()
         withAnimation(NotchAnimation.activityIn) {
             model.activity = activity
@@ -223,6 +244,11 @@ final class NotchWindowController {
     }
 
     private func updateHover() {
+        // На Mac без выреза остров выключен — не раскрываем
+        if model.isHiddenHere {
+            if model.isExpanded { setExpanded(false) }
+            return
+        }
         let mouse = NSEvent.mouseLocation
         let f = panel.frame
         // Зона срабатывания: чуть больше выреза в свёрнутом виде, весь остров — в раскрытом
@@ -267,6 +293,8 @@ final class NotchWindowController {
             model.isExpanded = value
         }
         panel.ignoresMouseEvents = !value
+        // Свернулись — зеркало выключаем (камера гаснет)
+        if !value { model.showMirror = false }
 
         // Лёгкий щелчок трекпада при раскрытии
         if value && Self.setting("hapticFeedback", default: true) {

@@ -84,6 +84,22 @@
         }
       }
     },
+    "Always show" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать всегда"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показувати завжди"
+          }
+        }
+      }
+    },
     "Animations" : {
       "localizations" : {
         "ru" : {
@@ -213,7 +229,52 @@
       }
     },
     "Brightness" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Яркость"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Яскравість"
+          }
+        }
+      }
+    },
+    "Camera" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Камера"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Камера"
+          }
+        }
+      }
+    },
+    "Camera access denied" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет доступа к камере"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Немає доступу до камери"
+          }
+        }
+      }
     },
     "Charging and headphones" : {
       "localizations" : {
@@ -535,6 +596,22 @@
         }
       }
     },
+    "Hide" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скрыть"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Приховати"
+          }
+        }
+      }
+    },
     "Hold Option and Shift while pressing the keys for finer steps. Brightness works on the built-in display." : {
       "localizations" : {
         "ru" : {
@@ -711,6 +788,22 @@
         }
       }
     },
+    "Macs without a notch" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac без выреза"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac без вирізу"
+          }
+        }
+      }
+    },
     "Made by requiem" : {
       "localizations" : {
         "ru" : {
@@ -743,6 +836,38 @@
         }
       }
     },
+    "Mirror" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Зеркало"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дзеркало"
+          }
+        }
+      }
+    },
+    "Mirror button" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кнопка зеркала"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кнопка дзеркала"
+          }
+        }
+      }
+    },
     "Move the cursor to the notch to open the island." : {
       "localizations" : {
         "ru" : {
@@ -771,6 +896,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Наступний"
+          }
+        }
+      }
+    },
+    "No camera found" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Камера не найдена"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Камеру не знайдено"
           }
         }
       }
@@ -823,6 +964,22 @@
         }
       }
     },
+    "On a MacBook Air, iMac or external display the island can stay out of the way of the menu bar." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На MacBook Air, iMac или внешнем мониторе остров может не мешать строке меню."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На MacBook Air, iMac чи зовнішньому моніторі острів може не заважати рядку меню."
+          }
+        }
+      }
+    },
     "Open" : {
       "localizations" : {
         "ru" : {
@@ -851,6 +1008,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Затримка відкриття"
+          }
+        }
+      }
+    },
+    "Open Settings" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть настройки"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити налаштування"
           }
         }
       }
@@ -1047,9 +1220,6 @@
         }
       }
     },
-    "RequiemNotch" : {
-
-    },
     "RequiemNotch needs it to catch the volume and brightness keys before macOS shows its own indicator." : {
       "localizations" : {
         "ru" : {
@@ -1210,6 +1380,22 @@
         }
       }
     },
+    "Show a camera button in the island to quickly check how you look before a call." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать в острове кнопку камеры, чтобы быстро глянуть на себя перед созвоном."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показувати в острові кнопку камери, щоб швидко глянути на себе перед дзвінком."
+          }
+        }
+      }
+    },
     "Show charging animation" : {
       "localizations" : {
         "ru" : {
@@ -1254,6 +1440,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Показати у Finder"
+          }
+        }
+      }
+    },
+    "Show on hover" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать при наведении"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показувати під час наведення"
           }
         }
       }
@@ -1499,7 +1701,20 @@
       }
     },
     "Volume" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Громкость"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Гучність"
+          }
+        }
+      }
     },
     "Volume and brightness" : {
       "localizations" : {
