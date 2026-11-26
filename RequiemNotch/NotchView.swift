@@ -124,6 +124,8 @@ struct CompactActivityView: View {
             MusicCompactView()
         case .bluetooth:
             BluetoothCompactView()
+        case .hud:
+            HUDCompactView()
         case .charging:
             HStack {
                 Image(systemName: "bolt.fill")
@@ -237,12 +239,8 @@ struct ExpandedHeader: View {
 
     var body: some View {
         HStack {
-            // Дата слева (обновляется каждую минуту)
-            TimelineView(.everyMinute) { context in
-                Text(context.date, format: .dateTime.weekday(.abbreviated).day().month())
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(.secondary)
-            }
+            // Слева — громкость, яркость и дата
+            HeaderLeading()
             Spacer()
             // Справа — подключённые наушники и батарея
             HStack(spacing: 12) {

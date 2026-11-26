@@ -1,6 +1,8 @@
 import SwiftUI
 import AppKit
 import ServiceManagement
+import Combine
+import ApplicationServices
 
 // MARK: - Меню в строке меню
 
@@ -52,10 +54,12 @@ struct SettingsView: View {
                 .tabItem { Label("Battery", systemImage: "bolt.fill") }
             DevicesSettings()
                 .tabItem { Label("Devices", systemImage: "headphones") }
+            HUDSettings()
+                .tabItem { Label("HUD", systemImage: "speaker.wave.2") }
             AboutSettings()
                 .tabItem { Label("About", systemImage: "info.circle") }
         }
-        .frame(width: 560, height: 480)
+        .frame(width: 620, height: 480)
     }
 }
 
@@ -271,6 +275,58 @@ struct DevicesSettings: View {
             }
         }
         .formStyle(.grouped)
+    }
+}
+
+// MARK: - Вкладка «HUD»: громкость и яркость
+
+struct HUDSettings: View {
+    @AppStorage("replaceSystemHUD") private var enabled = false
+    @AppStorage("hudShowPercent") private var showPercent = true
+    @State private var trusted = AXIsProcessTrusted()
+    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+
+    var body: some View {
+        Form {
+            Section("Volume and brightness") {
+                Toggle(isOn: $enabled) {
+                    Text("Replace system HUD")
+                    Text("Show volume and brightness changes in the island instead of the standard macOS indicator.")
+                }
+                Toggle(isOn: $showPercent) {
+                    Text("Show percentage")
+                    Text("Show the exact level next to the bar.")
+                }
+                .disabled(!enabled)
+            }
+
+            if enabled {
+                Section("Permission") {
+                    if trusted {
+                        Label("Accessibility access granted", systemImage: "checkmark.circle.fill")
+                            .foregroundStyle(.green)
+                    } else {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label("Accessibility access required", systemImage: "exclamationmark.triangle.fill")
+                                .foregroundStyle(.orange)
+                            Text("RequiemNotch needs it to catch the volume and brightness keys before macOS shows its own indicator.")
+                                .font(.callout)
+                                .foregroundStyle(.secondary)
+                            Button("Grant Access") { HUDController.requestAccess() }
+                        }
+                    }
+                }
+            }
+
+            Section {
+                Label("Hold Option and Shift while pressing the keys for finer steps. Brightness works on the built-in display.",
+                      systemImage: "info.circle")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .formStyle(.grouped)
+        .onReceive(timer) { _ in trusted = AXIsProcessTrusted() }
     }
 }
 

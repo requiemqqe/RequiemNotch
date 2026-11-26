@@ -51,6 +51,7 @@ enum NotchActivity: Equatable {
     case charging
     case nowPlaying
     case bluetooth
+    case hud
 }
 
 final class NotchModel: ObservableObject {
@@ -64,8 +65,10 @@ final class NotchModel: ObservableObject {
     /// Размер раскрытого острова
     let expandedSize = CGSize(width: 600, height: 180)
     /// Размер острова с мини-уведомлением: вырез + по 80pt с каждой стороны
+    /// (HUD громкости и яркости шире — по 130pt, чтобы влезла полоска)
     var activitySize: CGSize {
-        CGSize(width: notchSize.width + 160, height: notchSize.height)
+        let extra: CGFloat = activity == .hud ? 260 : 160
+        return CGSize(width: notchSize.width + extra, height: notchSize.height)
     }
 }
 
@@ -112,6 +115,7 @@ final class NotchWindowController {
     let shelf = ShelfModel()
     let nowPlaying = NowPlayingMonitor()
     let bluetooth = BluetoothMonitor()
+    let hud = HUDController()
     private let panel = NotchPanel()
     private var activityHideWork: DispatchWorkItem?
     private var monitors: [Any] = []
@@ -124,7 +128,14 @@ final class NotchWindowController {
             .environmentObject(battery)
             .environmentObject(shelf)
             .environmentObject(nowPlaying)
-            .environmentObject(bluetooth))
+            .environmentObject(bluetooth)
+            .environmentObject(hud))
+
+        // Громкость или яркость изменились — показать HUD
+        hud.onShow = { [weak self] in
+            self?.showActivity(.hud, duration: 1.5)
+        }
+        hud.start()
 
         // Подключили наушники — показать мини-уведомление
         bluetooth.onConnected = { [weak self] in

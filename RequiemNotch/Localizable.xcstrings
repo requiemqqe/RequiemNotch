@@ -52,6 +52,38 @@
         }
       }
     },
+    "Accessibility access granted" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Универсальный доступ разрешён"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Універсальний доступ надано"
+          }
+        }
+      }
+    },
+    "Accessibility access required" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нужен Универсальный доступ"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Потрібен Універсальний доступ"
+          }
+        }
+      }
+    },
     "Animations" : {
       "localizations" : {
         "ru" : {
@@ -179,6 +211,9 @@
           }
         }
       }
+    },
+    "Brightness" : {
+
     },
     "Charging and headphones" : {
       "localizations" : {
@@ -436,6 +471,22 @@
         }
       }
     },
+    "Grant Access" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выдать доступ"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Надати доступ"
+          }
+        }
+      }
+    },
     "Green when the charge is high, then yellow, orange and red as it drops. When off, the icon looks like the one in the macOS menu bar." : {
       "localizations" : {
         "ru" : {
@@ -480,6 +531,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Лише навушники"
+          }
+        }
+      }
+    },
+    "Hold Option and Shift while pressing the keys for finer steps. Brightness works on the built-in display." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Зажмите Option и Shift, чтобы менять уровень мелкими шагами. Яркость работает для встроенного экрана."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Затисніть Option і Shift, щоб змінювати рівень дрібними кроками. Яскравість працює для вбудованого екрана."
           }
         }
       }
@@ -560,6 +627,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Як швидко потовщується смуга прогресу під час наведення. 0 — без анімації."
+          }
+        }
+      }
+    },
+    "HUD" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HUD"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HUD"
           }
         }
       }
@@ -788,6 +871,22 @@
         }
       }
     },
+    "Permission" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Разрешение"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дозвіл"
+          }
+        }
+      }
+    },
     "Play / Pause" : {
       "localizations" : {
         "ru" : {
@@ -932,8 +1031,40 @@
         }
       }
     },
+    "Replace system HUD" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Заменить системный HUD"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Замінити системний HUD"
+          }
+        }
+      }
+    },
     "RequiemNotch" : {
 
+    },
+    "RequiemNotch needs it to catch the volume and brightness keys before macOS shows its own indicator." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Он нужен RequiemNotch, чтобы перехватывать клавиши громкости и яркости раньше, чем macOS покажет свой индикатор."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Він потрібен RequiemNotch, щоб перехоплювати клавіші гучності та яскравості раніше, ніж macOS покаже свій індикатор."
+          }
+        }
+      }
     },
     "Reset" : {
       "localizations" : {
@@ -1127,6 +1258,22 @@
         }
       }
     },
+    "Show percentage" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать проценты"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показувати відсотки"
+          }
+        }
+      }
+    },
     "Show the battery level for a few seconds when you connect the charger." : {
       "localizations" : {
         "ru" : {
@@ -1159,6 +1306,22 @@
         }
       }
     },
+    "Show the exact level next to the bar." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать точный уровень рядом с полоской."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показувати точний рівень поруч зі смужкою."
+          }
+        }
+      }
+    },
     "Show track changes" : {
       "localizations" : {
         "ru" : {
@@ -1171,6 +1334,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Показувати зміну треку"
+          }
+        }
+      }
+    },
+    "Show volume and brightness changes in the island instead of the standard macOS indicator." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать изменение громкости и яркости в острове вместо стандартного индикатора macOS."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показувати зміну гучності та яскравості в острові замість стандартного індикатора macOS."
           }
         }
       }
@@ -1315,6 +1494,25 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Відкрити на GitHub"
+          }
+        }
+      }
+    },
+    "Volume" : {
+
+    },
+    "Volume and brightness" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Громкость и яркость"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Гучність і яскравість"
           }
         }
       }
