@@ -276,18 +276,18 @@
         }
       }
     },
-    "Charging and headphones" : {
+    "Charging, headphones and new tracks briefly appear in the notch." : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Зарядка и наушники"
+            "value" : "Зарядка, наушники и новые треки ненадолго появляются в вырезе."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Заряджання й навушники"
+            "value" : "Заряджання, навушники й нові треки ненадовго з'являються у вирізі."
           }
         }
       }
@@ -320,6 +320,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Перевірити оновлення…"
+          }
+        }
+      }
+    },
+    "Check how you look before a call. The camera turns off when you leave." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Гляньте на себя перед созвоном. Камера выключается, когда вы уходите."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подивіться на себе перед дзвінком. Камера вимикається, коли ви йдете."
           }
         }
       }
@@ -388,18 +404,18 @@
         }
       }
     },
-    "Click the capsule icon in the menu bar to open settings or quit." : {
+    "Click the island icon in the menu bar. Updates install by themselves." : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Нажмите на значок-капсулу в строке меню, чтобы открыть настройки или выйти."
+            "value" : "Нажмите на значок острова в строке меню. Обновления ставятся сами."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Натисніть на значок-капсулу в рядку меню, щоб відкрити налаштування або вийти."
+            "value" : "Натисніть на значок острова в рядку меню. Оновлення встановлюються самі."
           }
         }
       }
@@ -416,6 +432,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Натисніть, щоб скопіювати"
+          }
+        }
+      }
+    },
+    "Click to copy again, pin what matters. Passwords are never saved." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Клик — и снова скопировано, важное можно закрепить. Пароли не сохраняются."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Клік — і знову скопійовано, важливе можна закріпити. Паролі не зберігаються."
           }
         }
       }
@@ -500,6 +532,22 @@
         }
       }
     },
+    "Continue" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Продолжить"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Продовжити"
+          }
+        }
+      }
+    },
     "Control your music" : {
       "localizations" : {
         "ru" : {
@@ -564,18 +612,34 @@
         }
       }
     },
-    "Drop files onto the island to carry them between desktops." : {
+    "Drop files on the island and drag them out on any desktop." : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Бросьте файлы на остров, чтобы переносить их между рабочими столами."
+            "value" : "Бросьте файлы на остров и утащите их на любом рабочем столе."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Киньте файли на острів, щоб переносити їх між робочими столами."
+            "value" : "Киньте файли на острів і витягніть їх на будь-якому робочому столі."
+          }
+        }
+      }
+    },
+    "Files shelf" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Полка для файлов"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Полиця для файлів"
           }
         }
       }
@@ -720,6 +784,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Лише навушники"
+          }
+        }
+      }
+    },
+    "Here's everything the island can do now." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вот всё, что теперь умеет остров."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ось усе, що тепер вміє острів."
           }
         }
       }
@@ -916,22 +996,6 @@
         }
       }
     },
-    "Keep files at hand" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Файлы под рукой"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Файли під рукою"
-          }
-        }
-      }
-    },
     "Language" : {
       "localizations" : {
         "ru" : {
@@ -976,6 +1040,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Запускати під час входу в систему"
+          }
+        }
+      }
+    },
+    "Live notifications" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Живые уведомления"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Живі сповіщення"
           }
         }
       }
@@ -1060,18 +1140,34 @@
         }
       }
     },
-    "Move the cursor to the notch to open the island." : {
+    "Move the cursor to the notch and the island opens." : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Подведите курсор к вырезу, чтобы раскрыть остров."
+            "value" : "Подведите курсор к вырезу — и остров раскроется."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Підведіть курсор до вирізу, щоб розкрити острів."
+            "value" : "Підведіть курсор до вирізу — і острів розкриється."
+          }
+        }
+      }
+    },
+    "Music, Spotify, YouTube and more. Drag the progress bar to scrub." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Музыка, Spotify, YouTube и не только. Тяните полосу прогресса для перемотки."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Музика, Spotify, YouTube і не тільки. Тягніть смугу прогресу для перемотування."
           }
         }
       }
@@ -1572,22 +1668,6 @@
         }
       }
     },
-    "See what's playing in any app and control it right from the notch." : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Смотрите, что играет в любом приложении, и управляйте прямо из выреза."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Дивіться, що грає в будь-якому застосунку, і керуйте просто з вирізу."
-          }
-        }
-      }
-    },
     "Send Feedback" : {
       "localizations" : {
         "ru" : {
@@ -1620,18 +1700,18 @@
         }
       }
     },
-    "Settings in the menu bar" : {
+    "Settings and updates" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Настройки в строке меню"
+            "value" : "Настройки и обновления"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Налаштування в рядку меню"
+            "value" : "Налаштування й оновлення"
           }
         }
       }
@@ -1876,6 +1956,22 @@
         }
       }
     },
+    "Sliders in the island. Turn on Settings → HUD for a new indicator." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ползунки прямо в острове. Новый индикатор — в Settings → HUD."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Повзунки просто в острові. Новий індикатор — у Settings → HUD."
+          }
+        }
+      }
+    },
     "Start RequiemNotch automatically when you log in to your Mac." : {
       "localizations" : {
         "ru" : {
@@ -1920,22 +2016,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Як у системі"
-          }
-        }
-      }
-    },
-    "The island briefly shows when you plug in the charger or connect headphones." : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Остров ненадолго показывает подключение зарядки или наушников."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Острів ненадовго показує підключення зарядки чи навушників."
           }
         }
       }
@@ -2096,6 +2176,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ласкаво просимо до RequiemNotch"
+          }
+        }
+      }
+    },
+    "What's New in RequiemNotch %@" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Что нового в RequiemNotch %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Що нового в RequiemNotch %@"
           }
         }
       }
