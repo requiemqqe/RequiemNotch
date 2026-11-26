@@ -19,11 +19,30 @@
       "version": {
         "branch": "master",
       },
+    }, {
+      "kind": "remote",
+      "repository": "https://github.com/sparkle-project/Sparkle",
+      "version": {
+        "up-to-next-major-version": "2.10.1",
+      },
     },
   ],
   "files": [
-    { "kind": "folder", "path": "RequiemNotch", "target-membership": [ "RequiemNotch" ] },
     {
+      "kind": "folder",
+      "path": "RequiemNotch",
+      "target-membership": [
+        "RequiemNotch",
+      ],
+      "membership-exceptions": [
+        {
+          "target": "RequiemNotch",
+          "exclusions": [
+            "Info.plist",
+          ],
+        },
+      ],
+    }, {
       "kind": "group",
       "name": "Products",
       "children": [
@@ -50,6 +69,10 @@
       ],
       "package-product-members": [
         {
+          "package": "Sparkle",
+          "product-name": "Sparkle",
+          "build-phase": { "build-phase": "frameworks" },
+        }, {
           "package": "mediaremote-adapter",
           "product-name": "MediaRemoteAdapter",
           "build-phase": { "build-phase": "copy/Embed Frameworks", "code-sign-on-copy": true },
@@ -77,6 +100,7 @@
         "ENABLE_RESOURCE_ACCESS_LOCATION": "NO",
         "ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY": "NO",
         "GENERATE_INFOPLIST_FILE": "YES",
+        "INFOPLIST_FILE": "RequiemNotch/Info.plist",
         "INFOPLIST_KEY_LSUIElement": "YES",
         "INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription": "RequiemNotch shows your headphones and their battery level when they connect.",
         "INFOPLIST_KEY_NSCameraUsageDescription": "RequiemNotch shows a mirror preview so you can check how you look before a call.",

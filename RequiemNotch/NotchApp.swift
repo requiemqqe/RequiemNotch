@@ -38,6 +38,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Первый запуск — объяснить, как всё работает
         WelcomeWindow.showIfNeeded()
 
+        // Запустить проверку обновлений
+        _ = Updater.shared
+
         // Подключили/отключили монитор, сменили разрешение — пересчитать позицию
         NotificationCenter.default.addObserver(
             forName: NSApplication.didChangeScreenParametersNotification,
@@ -58,6 +61,11 @@ enum NonNotchMode: String, CaseIterable, Identifiable {
     }
 }
 
+/// Что показано справа в раскрытом острове
+enum RightPanel: String, CaseIterable {
+    case shelf, clipboard, mirror
+}
+
 /// Мини-уведомления, которые остров показывает сам (без наведения)
 enum NotchActivity: Equatable {
     case charging
@@ -70,8 +78,10 @@ final class NotchModel: ObservableObject {
     @Published var isExpanded = false
     /// Над островом сейчас тащат файл
     @Published var isDropTargeted = false
-    /// В острове вместо полки показано зеркало с камеры
-    @Published var showMirror = false
+    /// Что показано справа: полка, буфер обмена или зеркало
+    @Published var rightPanel: RightPanel = .shelf
+    /// Сколько файлов на полке (от этого зависит высота острова)
+    @Published var shelfCount = 0
     /// У текущего экрана есть вырез
     @Published var hasNotch = true
 
@@ -81,8 +91,17 @@ final class NotchModel: ObservableObject {
     @Published var activity: NotchActivity? = nil
     /// Реальный размер выреза (или запасной, если экран без выреза)
     @Published var notchSize = CGSize(width: 200, height: 32)
-    /// Размер раскрытого острова
-    let expandedSize = CGSize(width: 600, height: 180)
+    /// Высота правой панели
+    var panelHeight: CGFloat {
+        switch rightPanel {
+        case .shelf: return ShelfLayout.height(for: shelfCount)
+        case .clipboard, .mirror: return 186
+        }
+    }
+    /// Размер раскрытого острова: растёт вместе с правой панелью
+    var expandedSize: CGSize {
+        CGSize(width: 640, height: 70 + panelHeight)
+    }
     /// Размер острова с мини-уведомлением: вырез + по 80pt с каждой стороны
     /// (HUD громкости и яркости шире — по 130pt, чтобы влезла полоска)
     var activitySize: CGSize {
@@ -139,7 +158,10 @@ final class NotchWindowController {
     private var activityHideWork: DispatchWorkItem?
     private var monitors: [Any] = []
     /// Панель большая и прозрачная; видимая часть рисуется в SwiftUI
-    private let panelSize = CGSize(width: 700, height: 260)
+    /// (высота с запасом под полку из трёх рядов и тень)
+    private let panelSize = CGSize(width: 760, height: 400)
+    let clipboard = ClipboardHistory()
+    private var subscriptions = Set<AnyCancellable>()
 
     func show() {
         panel.contentView = NSHostingView(rootView: NotchView()
@@ -148,7 +170,15 @@ final class NotchWindowController {
             .environmentObject(shelf)
             .environmentObject(nowPlaying)
             .environmentObject(bluetooth)
-            .environmentObject(hud))
+            .environmentObject(hud)
+            .environmentObject(clipboard))
+
+        // Высота острова следит за количеством файлов на полке
+        shelf.$items
+            .sink { [weak self] items in self?.model.shelfCount = items.count }
+            .store(in: &subscriptions)
+
+        clipboard.start()
 
         // Громкость или яркость изменились — показать HUD
         hud.onShow = { [weak self] in
@@ -294,7 +324,7 @@ final class NotchWindowController {
         }
         panel.ignoresMouseEvents = !value
         // Свернулись — зеркало выключаем (камера гаснет)
-        if !value { model.showMirror = false }
+        if !value && model.rightPanel == .mirror { model.rightPanel = .shelf }
 
         // Лёгкий щелчок трекпада при раскрытии
         if value && Self.setting("hapticFeedback", default: true) {

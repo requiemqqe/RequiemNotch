@@ -17,9 +17,13 @@ final class CameraController: ObservableObject {
 
     private let queue = DispatchQueue(label: "RequiemNotch.camera")
     private var configured = false
+    /// Зеркало сейчас открыто. Если пользователь ответил на запрос доступа уже после
+    /// того, как остров свернулся, камеру включать нельзя
+    private var wanted = false
 
     /// Включить камеру (при первом разе macOS спросит разрешение)
     func start() {
+        wanted = true
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
             run()
@@ -27,7 +31,9 @@ final class CameraController: ObservableObject {
             status = .starting
             AVCaptureDevice.requestAccess(for: .video) { granted in
                 DispatchQueue.main.async {
-                    if granted { self.run() } else { self.status = .denied }
+                    if !granted { self.status = .denied }
+                    else if self.wanted { self.run() }
+                    else { self.status = .idle }
                 }
             }
         default:
@@ -37,6 +43,7 @@ final class CameraController: ObservableObject {
 
     /// Выключить камеру (зелёный огонёк гаснет)
     func stop() {
+        wanted = false
         queue.async {
             if self.session.isRunning { self.session.stopRunning() }
         }
@@ -60,7 +67,11 @@ final class CameraController: ObservableObject {
                 self.configured = true
             }
             if !self.session.isRunning { self.session.startRunning() }
-            DispatchQueue.main.async { self.status = .running }
+            DispatchQueue.main.async {
+                // Пока камера запускалась, остров успели свернуть — сразу выключаем
+                guard self.wanted else { self.stop(); return }
+                self.status = .running
+            }
         }
     }
 }
@@ -104,6 +115,7 @@ struct CameraPreview: NSViewRepresentable {
 
 struct MirrorView: View {
     @ObservedObject private var camera = CameraController.shared
+    let height: CGFloat
 
     var body: some View {
         ZStack {
@@ -148,33 +160,10 @@ struct MirrorView: View {
                     .controlSize(.small)
             }
         }
-        .frame(width: 260, height: 110)
+        .frame(width: ShelfLayout.panelWidth, height: height)
         .clipShape(RoundedRectangle(cornerRadius: 14))
         .animation(NotchAnimation.content, value: camera.status)
         .onAppear { camera.start() }
         .onDisappear { camera.stop() }
-    }
-}
-
-// MARK: - Кнопка зеркала в шапке острова
-
-struct MirrorButton: View {
-    @EnvironmentObject var model: NotchModel
-    @AppStorage("showMirrorButton") private var enabled = true
-
-    var body: some View {
-        if enabled {
-            Button {
-                withAnimation(NotchAnimation.content) { model.showMirror.toggle() }
-            } label: {
-                Image(systemName: model.showMirror ? "web.camera.fill" : "web.camera")
-                    .font(.system(size: 12, weight: .semibold))
-                    .frame(width: 18, height: 18)
-                    .contentTransition(.symbolEffect(.replace))
-            }
-            .buttonStyle(.pressable)
-            .foregroundStyle(model.showMirror ? Color.white : Color.secondary)
-            .help("Mirror")
-        }
     }
 }

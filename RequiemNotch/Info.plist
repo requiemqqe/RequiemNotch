@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SUFeedURL</key>
+	<string>https://raw.githubusercontent.com/requiemqqe/RequiemNotch/main/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>r22tf8nxLj/q+GZwEm2rdHDvSWKkl/dmO5egu99v7z0=</string>
+</dict>
+</plist>

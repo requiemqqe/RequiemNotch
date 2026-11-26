@@ -65,6 +65,8 @@ struct NotchView: View {
         }
         // Ушки выходят за пределы выреза, поэтому добавляем их ширину
         .frame(width: size.width + top * 2, height: size.height)
+        // Остров плавно растёт, когда на полку добавили ряд или сменили вкладку
+        .animation(NotchAnimation.open, value: model.panelHeight)
         // Всё, что выходит за чёрную форму, не видно
         .clipShape(NotchShape(topRadius: top, bottomRadius: bottom))
         // Мягкая тень у раскрытого острова
@@ -72,6 +74,8 @@ struct NotchView: View {
         .opacity(isInvisible ? 0 : 1)
         // Приём файлов на весь остров (не зависит от анимаций содержимого)
         .onDrop(of: [.fileURL], isTargeted: $model.isDropTargeted) { providers in
+            // Файл тащат с нашей же полки — не принимаем, иначе будет дубликат
+            guard !shelf.isDraggingOut else { return false }
             shelf.add(providers: providers)
             return true
         }
@@ -256,7 +260,6 @@ struct ExpandedHeader: View {
             Spacer()
             // Справа — подключённые наушники и батарея
             HStack(spacing: 12) {
-                MirrorButton()
                 BluetoothBadge()
                 BatteryBadge()
             }
@@ -282,7 +285,7 @@ struct ClockView: View {
     }
 }
 
-/// Сюда добавляешь свои модули: плеер, календарь, полку файлов и т.д.
+/// Содержимое раскрытого острова: слева плеер или часы, справа панель с вкладками
 struct ExpandedContent: View {
     @EnvironmentObject var nowPlaying: NowPlayingMonitor
     @EnvironmentObject var model: NotchModel
@@ -298,22 +301,106 @@ struct ExpandedContent: View {
                     .transition(.blurFade)
             }
             Spacer(minLength: 0)
-            // Справа — зеркало или полка
-            if model.showMirror {
-                MirrorView()
-                    .transition(.blurFade)
-            } else {
-                ShelfView()
-                    .transition(.blurFade)
-            }
+            RightPanelView()
         }
         .foregroundStyle(.white)
-        // Плавное переключение часы ↔ плеер и зеркало ↔ полка
+        // Плавное переключение часы ↔ плеер
         .animation(NotchAnimation.content, value: nowPlaying.hasMedia)
-        .animation(NotchAnimation.content, value: model.showMirror)
-        // Тащат файл на остров — вернуть полку
+    }
+}
+
+// MARK: - Правая панель: переключатель вкладок + полка / буфер / зеркало
+
+struct RightPanelView: View {
+    @EnvironmentObject var model: NotchModel
+    @AppStorage("clipboardHistory") private var clipboardEnabled = true
+    @AppStorage("showMirrorButton") private var mirrorEnabled = true
+    @Namespace private var selection
+
+    /// Вкладки, включённые в настройках
+    private var tabs: [RightPanel] {
+        RightPanel.allCases.filter { tab in
+            switch tab {
+            case .shelf: return true
+            case .clipboard: return clipboardEnabled
+            case .mirror: return mirrorEnabled
+            }
+        }
+    }
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 8) {
+            // Вкладку выключили в настройках, пока она была открыта — показываем полку
+            let current = tabs.contains(model.rightPanel) ? model.rightPanel : .shelf
+
+            if tabs.count > 1 {
+                VStack(spacing: 4) {
+                    ForEach(tabs, id: \.self) { tab in
+                        tabButton(tab, isSelected: tab == current)
+                    }
+                }
+                .padding(3)
+                .background(Capsule().fill(.white.opacity(0.06)))
+            }
+
+            Group {
+                switch current {
+                case .shelf:
+                    ShelfView()
+                case .clipboard:
+                    ClipboardView(height: model.panelHeight)
+                case .mirror:
+                    MirrorView(height: model.panelHeight)
+                }
+            }
+            .id(current)
+            .transition(.blurFade)
+        }
+        .animation(NotchAnimation.content, value: model.rightPanel)
+        // Тащат файл на остров — сразу открыть полку
         .onChange(of: model.isDropTargeted) { _, targeted in
-            if targeted { model.showMirror = false }
+            if targeted && model.rightPanel != .shelf {
+                withAnimation(NotchAnimation.content) { model.rightPanel = .shelf }
+            }
+        }
+    }
+
+    private func tabButton(_ tab: RightPanel, isSelected: Bool) -> some View {
+        Button {
+            withAnimation(NotchAnimation.content) { model.rightPanel = tab }
+        } label: {
+            Image(systemName: tab.symbol(selected: isSelected))
+                .font(.system(size: 11, weight: .semibold))
+                .frame(width: 24, height: 24)
+                .foregroundStyle(isSelected ? Color.black : Color.secondary)
+                .background {
+                    if isSelected {
+                        Circle()
+                            .fill(.white)
+                            .matchedGeometryEffect(id: "selection", in: selection)
+                    }
+                }
+                .contentTransition(.symbolEffect(.replace))
+        }
+        .buttonStyle(.pressable)
+        .help(tab.title)
+    }
+}
+
+extension RightPanel {
+    func symbol(selected: Bool) -> String {
+        switch self {
+        case .shelf: return selected ? "tray.full.fill" : "tray.full"
+        case .clipboard: return selected ? "doc.on.clipboard.fill" : "doc.on.clipboard"
+        case .mirror: return selected ? "web.camera.fill" : "web.camera"
+        }
+    }
+
+    var title: LocalizedStringKey {
+        switch self {
+        case .shelf: return "Shelf"
+        case .clipboard: return "Clipboard"
+        case .mirror: return "Mirror"
         }
     }
 }

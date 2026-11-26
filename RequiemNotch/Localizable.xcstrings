@@ -292,6 +292,54 @@
         }
       }
     },
+    "Check for updates automatically" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проверять обновления автоматически"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перевіряти оновлення автоматично"
+          }
+        }
+      }
+    },
+    "Check for Updates…" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проверить обновления…"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перевірити оновлення…"
+          }
+        }
+      }
+    },
+    "Check Now" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проверить сейчас"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перевірити зараз"
+          }
+        }
+      }
+    },
     "Choose the interface language. The app restarts to apply it." : {
       "localizations" : {
         "ru" : {
@@ -304,6 +352,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Оберіть мову інтерфейсу. Щоб застосувати її, застосунок перезапуститься."
+          }
+        }
+      }
+    },
+    "Clear history" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Очистить историю"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Очистити історію"
           }
         }
       }
@@ -336,6 +400,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Натисніть на значок-капсулу в рядку меню, щоб відкрити налаштування або вийти."
+          }
+        }
+      }
+    },
+    "Click to copy" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нажмите, чтобы скопировать"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Натисніть, щоб скопіювати"
+          }
+        }
+      }
+    },
+    "Clipboard" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Буфер обмена"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Буфер обміну"
+          }
+        }
+      }
+    },
+    "Clipboard history" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "История буфера обмена"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Історія буфера обміну"
           }
         }
       }
@@ -400,6 +512,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Керуйте музикою"
+          }
+        }
+      }
+    },
+    "Copied text and images appear here" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Здесь появятся скопированные тексты и картинки"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тут з'являться скопійовані тексти й зображення"
           }
         }
       }
@@ -724,6 +852,22 @@
         }
       }
     },
+    "Image" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Картинка"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Зображення"
+          }
+        }
+      }
+    },
     "Island" : {
       "localizations" : {
         "ru" : {
@@ -736,6 +880,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Острів"
+          }
+        }
+      }
+    },
+    "Items to keep" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сколько хранить"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скільки зберігати"
+          }
+        }
+      }
+    },
+    "Keep clipboard history" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранять историю буфера"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Зберігати історію буфера"
           }
         }
       }
@@ -768,6 +944,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Мова"
+          }
+        }
+      }
+    },
+    "Last checked %@" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Последняя проверка: %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Остання перевірка: %@"
           }
         }
       }
@@ -1044,6 +1236,22 @@
         }
       }
     },
+    "Passwords copied from password managers are never saved. History is stored only on this Mac." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пароли из менеджеров паролей никогда не сохраняются. История хранится только на этом Mac."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Паролі з менеджерів паролів ніколи не зберігаються. Історія зберігається лише на цьому Mac."
+          }
+        }
+      }
+    },
     "Permission" : {
       "localizations" : {
         "ru" : {
@@ -1056,6 +1264,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Дозвіл"
+          }
+        }
+      }
+    },
+    "Pin" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закрепить"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закріпити"
+          }
+        }
+      }
+    },
+    "Pinned items are kept regardless of this limit." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закреплённые записи хранятся вне этого лимита."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закріплені записи зберігаються поза цим лімітом."
           }
         }
       }
@@ -1172,6 +1412,38 @@
         }
       }
     },
+    "Remember the text and images you copy, so you can copy them again from the island." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запоминать скопированные тексты и картинки, чтобы скопировать их снова из острова."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запам'ятовувати скопійовані тексти й зображення, щоб скопіювати їх знову з острова."
+          }
+        }
+      }
+    },
+    "Remove" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Видалити"
+          }
+        }
+      }
+    },
     "Remove from shelf" : {
       "localizations" : {
         "ru" : {
@@ -1216,6 +1488,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Замінити системний HUD"
+          }
+        }
+      }
+    },
+    "RequiemNotch checks once a day and offers to install new versions." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RequiemNotch проверяет раз в день и предлагает установить новую версию."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RequiemNotch перевіряє раз на день і пропонує встановити нову версію."
           }
         }
       }
@@ -1360,6 +1648,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Налаштування…"
+          }
+        }
+      }
+    },
+    "Shelf" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Полка"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Полиця"
           }
         }
       }
@@ -1648,6 +1952,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Фарбувати еквалайзер, смугу прогресу й кнопки в основний колір обкладинки. Якщо вимкнено — усе біле."
+          }
+        }
+      }
+    },
+    "Unpin" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открепить"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкріпити"
+          }
+        }
+      }
+    },
+    "Updates" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновления"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Оновлення"
           }
         }
       }

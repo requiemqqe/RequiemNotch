@@ -22,6 +22,8 @@ struct MenuBarContent: View {
         }
         .keyboardShortcut(",")
 
+        CheckForUpdatesButton()
+
         Button("Welcome Guide") {
             WelcomeWindow.show()
         }
@@ -54,12 +56,14 @@ struct SettingsView: View {
                 .tabItem { Label("Battery", systemImage: "bolt.fill") }
             DevicesSettings()
                 .tabItem { Label("Devices", systemImage: "headphones") }
+            ClipboardSettings()
+                .tabItem { Label("Clipboard", systemImage: "doc.on.clipboard") }
             HUDSettings()
                 .tabItem { Label("HUD", systemImage: "speaker.wave.2") }
             AboutSettings()
                 .tabItem { Label("About", systemImage: "info.circle") }
         }
-        .frame(width: 620, height: 480)
+        .frame(width: 700, height: 500)
     }
 }
 
@@ -99,6 +103,8 @@ struct GeneralSettings: View {
             Section("Startup") {
                 LaunchAtLoginToggle()
             }
+
+            UpdatesSection()
         }
         .formStyle(.grouped)
         .animation(.easeInOut(duration: 0.2), value: needsRestart)
@@ -290,6 +296,39 @@ struct DevicesSettings: View {
             Section {
                 Label("Battery level is available for AirPods and Beats. Other headphones are shown without it.",
                       systemImage: "info.circle")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .formStyle(.grouped)
+    }
+}
+
+// MARK: - Вкладка «Clipboard»: история буфера обмена
+
+struct ClipboardSettings: View {
+    @AppStorage("clipboardHistory") private var enabled = true
+    @AppStorage("clipboardLimit") private var limit = 30
+
+    var body: some View {
+        Form {
+            Section("Clipboard history") {
+                Toggle(isOn: $enabled) {
+                    Text("Keep clipboard history")
+                    Text("Remember the text and images you copy, so you can copy them again from the island.")
+                }
+                Picker(selection: $limit) {
+                    ForEach([10, 30, 50, 100], id: \.self) { Text(verbatim: "\($0)").tag($0) }
+                } label: {
+                    Text("Items to keep")
+                    Text("Pinned items are kept regardless of this limit.")
+                }
+                .disabled(!enabled)
+            }
+
+            Section {
+                Label("Passwords copied from password managers are never saved. History is stored only on this Mac.",
+                      systemImage: "lock.shield")
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }
