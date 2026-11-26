@@ -173,6 +173,14 @@ final class NotchWindowController {
             .environmentObject(hud)
             .environmentObject(clipboard))
 
+        // Камера работает, только пока остров раскрыт и выбрана вкладка зеркала
+        model.$isExpanded
+            .combineLatest(model.$rightPanel)
+            .map { expanded, panel in expanded && panel == .mirror }
+            .removeDuplicates()
+            .sink { active in CameraController.shared.setActive(active) }
+            .store(in: &subscriptions)
+
         // Высота острова следит за количеством файлов на полке
         shelf.$items
             .sink { [weak self] items in self?.model.shelfCount = items.count }
@@ -319,6 +327,17 @@ final class NotchWindowController {
     }
 
     private func setExpanded(_ value: Bool) {
+        // Вкладку выключили в настройках, пока она была выбрана — вернуться к полке
+        // (иначе остров брал бы её высоту, а камера могла бы включиться)
+        if value {
+            switch model.rightPanel {
+            case .clipboard where !Self.setting("clipboardHistory", default: true),
+                 .mirror where !Self.setting("showMirrorButton", default: true):
+                model.rightPanel = .shelf
+            default:
+                break
+            }
+        }
         withAnimation(value ? NotchAnimation.open : NotchAnimation.close) {
             model.isExpanded = value
         }

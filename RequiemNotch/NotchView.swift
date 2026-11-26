@@ -269,19 +269,31 @@ struct ExpandedHeader: View {
     }
 }
 
-// MARK: - Большие часы (когда ничего не играет)
+// MARK: - Часы (когда ничего не играет), растут вместе с островом
 
 struct ClockView: View {
+    let height: CGFloat
+    private var isLarge: Bool { height >= 170 }
+
     var body: some View {
         TimelineView(.everyMinute) { context in
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: isLarge ? 4 : 2) {
                 Text(context.date, format: .dateTime.hour().minute())
-                    .font(.system(size: 40, weight: .semibold, design: .rounded))
+                    .font(.system(size: isLarge ? 64 : 40, weight: .semibold, design: .rounded))
+                    .contentTransition(.numericText())
+                if isLarge {
+                    Text(context.date, format: .dateTime.weekday(.wide).day().month(.wide))
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(.secondary)
+                        .transition(.blurFade)
+                }
                 Text("Nothing playing")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.tertiary)
             }
+            .frame(width: 250, height: height, alignment: isLarge ? .leading : .topLeading)
         }
+        .animation(NotchAnimation.open, value: isLarge)
     }
 }
 
@@ -293,11 +305,12 @@ struct ExpandedContent: View {
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
             // Слева — плеер, если что-то играет, иначе часы
+            // Левая часть всегда той же высоты, что и правая панель
             if nowPlaying.hasMedia {
-                NowPlayingView()
+                NowPlayingView(height: model.panelHeight)
                     .transition(.blurFade)
             } else {
-                ClockView()
+                ClockView(height: model.panelHeight)
                     .transition(.blurFade)
             }
             Spacer(minLength: 0)

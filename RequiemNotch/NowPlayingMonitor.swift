@@ -201,71 +201,97 @@ struct MusicCompactView: View {
 }
 
 // MARK: - Плеер в раскрытом острове
+// Подстраивается под высоту острова: когда справа открыта камера, буфер или полка
+// в несколько рядов, плеер переходит в «большой» режим и заполняет всё место
 
 struct NowPlayingView: View {
+    /// Высота, которую плеер должен занять (равна высоте правой панели)
+    let height: CGFloat
     @EnvironmentObject var nowPlaying: NowPlayingMonitor
     @AppStorage("artworkColors") private var artworkColors = true
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .top, spacing: 10) {
-                // Обложка: клик открывает приложение-источник
-                Button { nowPlaying.openSourceApp() } label: {
-                    ArtworkView(image: nowPlaying.payload?.artwork, size: 52, corner: 10)
-                        .overlay(alignment: .bottomTrailing) {
-                            if let icon = nowPlaying.sourceAppIcon {
-                                Image(nsImage: icon)
-                                    .resizable()
-                                    .frame(width: 18, height: 18)
-                                    .shadow(color: .black.opacity(0.5), radius: 2)
-                                    .offset(x: 5, y: 5)
-                            }
-                        }
-                }
-                .buttonStyle(.pressable)
-                .help("Open source app")
-                // Новый трек — обложка плавно сменяется
-                .id(nowPlaying.payload?.title)
-                .transition(.blurFade)
+    private var isLarge: Bool { height >= 170 }
+    private var artworkSize: CGFloat { isLarge ? min(120, height - 100) : 52 }
 
-                VStack(alignment: .leading, spacing: 1) {
+    var body: some View {
+        let tint = nowPlaying.tint(artworkColors)
+
+        VStack(alignment: .leading, spacing: isLarge ? 12 : 8) {
+            HStack(alignment: isLarge ? .center : .top, spacing: isLarge ? 14 : 10) {
+                artwork(tint: tint)
+
+                VStack(alignment: .leading, spacing: isLarge ? 3 : 1) {
                     HStack(alignment: .top, spacing: 6) {
-                        VStack(alignment: .leading, spacing: 1) {
+                        VStack(alignment: .leading, spacing: isLarge ? 3 : 1) {
                             Text(nowPlaying.payload?.title ?? "")
-                                .font(.system(size: 13, weight: .semibold))
-                                .lineLimit(1)
+                                .font(.system(size: isLarge ? 15 : 13, weight: .semibold))
+                                .lineLimit(isLarge ? 2 : 1)
                                 .contentTransition(.interpolate)
                             Text(nowPlaying.payload?.artist ?? nowPlaying.payload?.applicationName ?? "")
-                                .font(.system(size: 12))
+                                .font(.system(size: isLarge ? 13 : 12))
                                 .foregroundStyle(.secondary)
                                 .lineLimit(1)
                                 .contentTransition(.interpolate)
                         }
                         Spacer(minLength: 0)
                         // Маленький эквалайзер в цвет обложки
-                        EqualizerBars(isPlaying: nowPlaying.isPlaying, color: nowPlaying.tint(artworkColors))
+                        EqualizerBars(isPlaying: nowPlaying.isPlaying, color: tint)
                             .scaleEffect(0.8, anchor: .topTrailing)
                             .padding(.top, 2)
                     }
 
-                    if nowPlaying.duration > 0 {
+                    // В обычном режиме полоса прогресса — под названием
+                    if !isLarge && nowPlaying.duration > 0 {
                         PlaybackProgress()
                             .padding(.top, 4)
                     }
                 }
             }
 
-            PlayerControls()
+            // В большом режиме — на всю ширину
+            if isLarge && nowPlaying.duration > 0 {
+                PlaybackProgress()
+                    .transition(.blurFade)
+            }
+
+            PlayerControls(large: isLarge)
         }
-        .frame(width: 250, alignment: .leading)
+        .frame(width: 250, height: height, alignment: isLarge ? .center : .top)
+        .animation(NotchAnimation.open, value: isLarge)
         .animation(NotchAnimation.content, value: nowPlaying.payload?.title)
-        .animation(NotchAnimation.content, value: nowPlaying.tint(artworkColors))
+        .animation(NotchAnimation.content, value: tint)
+    }
+
+    private func artwork(tint: Color) -> some View {
+        // Обложка: клик открывает приложение-источник
+        Button { nowPlaying.openSourceApp() } label: {
+            ArtworkView(image: nowPlaying.payload?.artwork, size: artworkSize,
+                        corner: isLarge ? 16 : 10)
+                // В большом режиме обложка мягко светится своим цветом
+                .shadow(color: isLarge ? tint.opacity(0.45) : .clear, radius: 18, y: 4)
+                .overlay(alignment: .bottomTrailing) {
+                    if let icon = nowPlaying.sourceAppIcon {
+                        Image(nsImage: icon)
+                            .resizable()
+                            .frame(width: isLarge ? 24 : 18, height: isLarge ? 24 : 18)
+                            .shadow(color: .black.opacity(0.5), radius: 2)
+                            .offset(x: 5, y: 5)
+                    }
+                }
+        }
+        .buttonStyle(.pressable)
+        .help("Open source app")
+        // Новый трек — обложка плавно сменяется
+        .id(nowPlaying.payload?.title)
+        .transition(.blurFade)
     }
 }
 
 // MARK: - Кнопки управления
 
 struct PlayerControls: View {
+    /// Крупные кнопки для большого режима плеера
+    var large = false
     @EnvironmentObject var nowPlaying: NowPlayingMonitor
     @AppStorage("showSkipButtons") private var showSkipButtons = false
     /// Длительность анимации ⏸ ↔ ▶︎ (настройки → Media), 0 — без анимации
@@ -305,8 +331,8 @@ struct PlayerControls: View {
 
             Button { nowPlaying.togglePlayPause() } label: {
                 Image(systemName: nowPlaying.isPlaying ? "pause.fill" : "play.fill")
-                    .font(.system(size: 20))
-                    .frame(width: 22)
+                    .font(.system(size: large ? 26 : 20))
+                    .frame(width: large ? 28 : 22)
                     // Смена ⏸ ↔ ▶︎ — скорость из настроек
                     .contentTransition(playPauseAnimation > 0
                         ? .symbolEffect(.replace, options: .speed(0.4 / playPauseAnimation))
@@ -346,8 +372,8 @@ struct PlayerControls: View {
             }
         }
         .buttonStyle(.pressable)
-        .font(.system(size: 14, weight: .medium))
-        .frame(height: 24)
+        .font(.system(size: large ? 16 : 14, weight: .medium))
+        .frame(height: large ? 32 : 24)
         .animation(NotchAnimation.content, value: showSkipButtons)
         .animation(NotchAnimation.content, value: tint)
     }

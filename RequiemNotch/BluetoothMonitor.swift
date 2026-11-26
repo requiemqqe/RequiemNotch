@@ -34,6 +34,8 @@ final class BluetoothMonitor: NSObject, ObservableObject {
     private var isStarting = true
     /// Обновление заряда раз в минуту, пока устройство подключено
     private var refreshTimer: Timer?
+    /// Сколько раз подряд заряд не удалось узнать
+    private var emptyRefreshes = 0
 
     func start() {
         connectNotification = IOBluetoothDevice.register(
@@ -62,6 +64,7 @@ final class BluetoothMonitor: NSObject, ObservableObject {
         if !isStarting { onConnected?() }
 
         // Заряд приходит не сразу после подключения — спрашиваем несколько раз
+        emptyRefreshes = 0
         for delay in [1.0, 4.0, 10.0] {
             DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
                 self?.refreshBattery()
@@ -95,8 +98,17 @@ final class BluetoothMonitor: NSObject, ObservableObject {
         DispatchQueue.global(qos: .utility).async { [weak self] in
             let levels = Self.readSystemReport(address: device.address, name: device.name)
             DispatchQueue.main.async {
-                guard let self, var updated = self.current, updated.address == device.address,
-                      let levels else { return }
+                guard let self, var updated = self.current, updated.address == device.address else { return }
+                guard let levels, levels.main != nil || levels.left != nil || levels.right != nil else {
+                    // Наушники не сообщают заряд системе — после трёх попыток перестаём спрашивать
+                    self.emptyRefreshes += 1
+                    if self.emptyRefreshes >= 3 {
+                        self.refreshTimer?.invalidate()
+                        self.refreshTimer = nil
+                    }
+                    return
+                }
+                self.emptyRefreshes = 0
                 updated.single = levels.main
                 updated.left = levels.left
                 updated.right = levels.right

@@ -89,6 +89,8 @@ final class ClipboardHistory: ObservableObject {
     // MARK: Добавление
 
     private func add(text: String) {
+        // Очень большие тексты (логи, целые документы) не храним — больше 200 000 символов
+        guard text.count <= 200_000 else { return }
         let fingerprint = "t:" + Self.digest(Data(text.utf8))
         if bumpExisting(fingerprint) { return }
         insert(ClipboardItem(id: UUID(), kind: .text, text: text,

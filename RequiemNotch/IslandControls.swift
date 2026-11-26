@@ -44,6 +44,7 @@ struct IslandSliderControl: View {
     @State private var hovering = false
     @State private var dragging = false
     @State private var closeWork: DispatchWorkItem?
+    @EnvironmentObject private var hud: HUDController
 
     private var isOpen: Bool { active == kind }
 
@@ -94,6 +95,12 @@ struct IslandSliderControl: View {
         // Отпустили ползунок уже за пределами — закрываем
         .onChange(of: dragging) { _, isDragging in
             if !isDragging && !hovering { scheduleClose() }
+        }
+        // Сразу показать реальный уровень (раньше иконка была пустой до наведения)
+        .onAppear { read() }
+        // Громкость или яркость поменяли клавишами — ползунок следует за ними
+        .onReceive(hud.$level) { _ in
+            if !dragging { read() }
         }
     }
 
