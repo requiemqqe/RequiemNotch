@@ -4,5 +4,14 @@
     <title>RequiemNotch</title>
     <link>https://github.com/requiemqqe/RequiemNotch</link>
     <!-- releases -->
+    <item>
+      <title>Version 1.3</title>
+      <pubDate>Wed, 25 Nov 2026 22:07:04 -0800</pubDate>
+      <sparkle:version>1</sparkle:version>
+      <sparkle:shortVersionString>1.3</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <description><![CDATA[<p>Clipboard history, camera mirror, volume and brightness HUD, auto-updates</p>]]></description>
+      <enclosure url="https://github.com/requiemqqe/RequiemNotch/releases/download/v1.3/RequiemNotch-1.3.zip" sparkle:edSignature="371eqC9ljNyfoLN0VQX6ze+my6C3zMTC5+u2rGUjyTKe4BXmbyUBpM7fHi7eUdCnmJKL80idBGzc4nwhP+7sBw==" length="2671492" type="application/octet-stream"/>
+    </item>
   </channel>
 </rss>
